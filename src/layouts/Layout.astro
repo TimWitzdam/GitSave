@@ -1,0 +1,33 @@
+<html lang="en-EN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+  </head>
+  <body>
+    <header></header>
+    <main class="bg-bg-300">
+      <slot />
+    </main>
+  </body>
+  <style is:global>
+    @font-face {
+      font-family: "DMSans";
+      src: url("/DMSans.ttf") format("truetype");
+    }
+
+    html {
+      font-family: "DMSans", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      background-color: theme("colors.bg.300");
+      color: white;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+  </style>
+</html>
