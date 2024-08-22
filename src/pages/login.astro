@@ -1,8 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import GitIcon from "../icons/git.svg?raw";
-import BaseInput from "../components/BaseInput.tsx";
-import BaseButton from "../components/BaseButton.tsx";
+import LoginForm from "../components/login/LoginForm";
 ---
 
 <Layout>
@@ -15,15 +14,7 @@ import BaseButton from "../components/BaseButton.tsx";
         <span class="text-2xl">GitSave</span>
       </div>
       <h1 class="text-center font-medium text-2xl mb-6">Sign in</h1>
-      <form action="submit" class="flex flex-col gap-4">
-        <BaseInput type="text" placeholder="Username" />
-        <BaseInput type="password" placeholder="Password" />
-        <a
-          class="text-secondary opacity-60 hover:opacity-100 transition-opacity"
-          >Forgot password?</a
-        >
-        <BaseButton>Sign in</BaseButton>
-      </form>
+      <LoginForm client:load />
     </div>
   </div>
 </Layout>

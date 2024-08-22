@@ -2,6 +2,7 @@ type Props = {
   type: string;
   value?: string;
   placeholder?: string;
+  name?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
@@ -12,6 +13,7 @@ export default function BaseInput(props: Props) {
         type={props.type}
         value={props.value}
         placeholder={props.placeholder}
+        name={props.name}
         className="bg-transparent outline-none p-3"
       />
     </div>

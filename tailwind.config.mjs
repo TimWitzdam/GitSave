@@ -14,6 +14,8 @@ export default {
           200: "#353535",
         },
         secondary: "#969699",
+        red: "#FF453A",
+        green: "#30D158",
       },
     },
   },
