@@ -1,0 +1,38 @@
+---
+import Schedule from "../../components/dashboard/Schedule";
+import MenuIcon from "../../components/icons/MenuIcon.astro";
+import ReloadIcon from "../../components/icons/ReloadIcon.astro";
+import TimeIcon from "../../components/icons/TimeIcon.astro";
+import DashboardLayout from "../../layouts/DashboardLayout.astro";
+---
+
+<DashboardLayout>
+  <div slot="header" class="flex items-center justify-between">
+    <h1 class="text-2xl font-medium">Overview</h1>
+    <button class="bg-bg-100 rounded-lg p-3 flex items-center justify-center">
+      <ReloadIcon />
+    </button>
+  </div>
+  <div class="p-4">
+    <h2 class="text-2xl font-medium mb-4">Schedules</h2>
+    <div class="rounded-lg bg-bg-300 border border-border-200">
+      <Schedule
+        name="Personal Website"
+        link="https://github.com/TimWitzdam/witzdam.com-v2"
+        lastBackup="2 minutes ago"
+      >
+        <MenuIcon />
+        <TimeIcon />
+      </Schedule>
+      <Schedule
+        name="Personal Website"
+        link="https://github.com/TimWitzdam/witzdam.com-v2"
+        lastBackup="2 minutes ago"
+        last
+      >
+        <MenuIcon />
+        <TimeIcon />
+      </Schedule>
+    </div>
+  </div>
+</DashboardLayout>

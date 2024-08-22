@@ -8,7 +8,7 @@ type Props = {
 
 export default function BaseInput(props: Props) {
   return (
-    <div className="rounded-lg bg-bg-200 border-2 border-border-200 hover:border-border-100 transition-colors focus-within:border-border-100">
+    <div className="rounded-lg bg-bg-300 border-2 border-border-200 hover:border-border-100 transition-colors focus-within:border-border-100">
       <input
         type={props.type}
         value={props.value}

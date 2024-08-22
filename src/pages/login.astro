@@ -1,7 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import GitIcon from "../icons/git.svg?raw";
 import LoginForm from "../components/login/LoginForm";
+import GitIcon from "../components/icons/GitIcon.astro";
 ---
 
 <Layout>
@@ -10,7 +10,7 @@ import LoginForm from "../components/login/LoginForm";
       <div
         class="rounded-lg p-4 flex items-center gap-4 border border-border-100 mb-6"
       >
-        <Fragment set:html={GitIcon} class="w-8 h-8" />
+        <GitIcon />
         <span class="text-2xl">GitSave</span>
       </div>
       <h1 class="text-center font-medium text-2xl mb-6">Sign in</h1>

@@ -1,0 +1,35 @@
+---
+import Layout from "./Layout.astro";
+import GitIcon from "../components/icons/GitIcon.astro";
+import UserIcon from "../components/icons/UserIcon.astro";
+import BurgerMenuIcon from "../components/icons/BurgerMenuIcon.astro";
+---
+
+<Layout>
+  <div
+    class="p-4 bg-[#151515] border-b border-border-200 flex items-center justify-between"
+  >
+    <div
+      class="rounded-lg p-2 flex items-center gap-4 border border-border-100 w-fit"
+    >
+      <GitIcon />
+      <span class="text-2xl hidden">GitSave</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <button
+        class="rounded-full border border-border-100 p-3 flex items-center justify-center"
+      >
+        <UserIcon />
+      </button>
+      <button
+        class="rounded-full border border-border-100 p-3 flex items-center justify-center"
+      >
+        <BurgerMenuIcon />
+      </button>
+    </div>
+  </div>
+  <div class="p-4 bg-[#151515] border-b border-border-200">
+    <slot name="header" />
+  </div>
+  <slot />
+</Layout>
