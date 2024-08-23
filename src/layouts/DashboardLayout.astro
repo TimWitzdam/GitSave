@@ -3,33 +3,61 @@ import Layout from "./Layout.astro";
 import GitIcon from "../components/icons/GitIcon.astro";
 import UserIcon from "../components/icons/UserIcon.astro";
 import BurgerMenuIcon from "../components/icons/BurgerMenuIcon.astro";
+
+const links = [
+  { name: "Overview", href: "/dashboard" },
+  { name: "Schedules", href: "/dashboard/schedules" },
+  { name: "History", href: "/dashboard/history" },
+  { name: "Settings", href: "/dashboard/settings" },
+  { name: "About", href: "/dashboard/about" },
+];
 ---
 
 <Layout>
-  <div
-    class="p-4 bg-[#151515] border-b border-border-200 flex items-center justify-between"
-  >
-    <div
-      class="rounded-lg p-2 flex items-center gap-4 border border-border-100 w-fit"
-    >
-      <GitIcon />
-      <span class="text-2xl hidden">GitSave</span>
+  <div class="pt-4 px-4 bg-[#151515] border-b border-border-200">
+    <div class="flex items-start justify-between md:mb-4">
+      <div
+        class="rounded-lg p-2 flex items-center gap-4 border border-border-100 w-fit mb-4"
+      >
+        <GitIcon />
+        <span class="text-2xl hidden md:inline">GitSave</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <button
+          class="rounded-full border border-border-100 p-3 flex items-center justify-center"
+        >
+          <UserIcon />
+        </button>
+        <button
+          class="rounded-full border border-border-100 p-3 flex items-center justify-center md:hidden"
+        >
+          <BurgerMenuIcon />
+        </button>
+      </div>
     </div>
-    <div class="flex items-center gap-4">
-      <button
-        class="rounded-full border border-border-100 p-3 flex items-center justify-center"
-      >
-        <UserIcon />
-      </button>
-      <button
-        class="rounded-full border border-border-100 p-3 flex items-center justify-center"
-      >
-        <BurgerMenuIcon />
-      </button>
+    <div class="hidden md:block">
+      <div class="flex gap-4">
+        {
+          links.map((link) => (
+            <a
+              href={link.href}
+              class={`px-4 py-2 rounded-t-lg text-secondary border-t border-x border-transparent hover:border-border-100 hover:text-white hover:bg-border-200 transition-colors${
+                link.href === Astro.url.pathname
+                  ? "border-border-100 text-white bg-border-200 "
+                  : ""
+              }`}
+            >
+              {link.name}
+            </a>
+          ))
+        }
+      </div>
     </div>
   </div>
-  <div class="p-4 bg-[#151515] border-b border-border-200">
-    <slot name="header" />
+  <div class="py-4 bg-[#151515] border-b border-border-200">
+    <div class="px-4 max-w-7xl mx-auto">
+      <slot name="header" />
+    </div>
   </div>
   <slot />
 </Layout>
