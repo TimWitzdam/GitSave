@@ -1,5 +1,5 @@
 ---
-import Schedule from "../../components/dashboard/Schedule";
+import ScheduleList from "../../components/dashboard/ScheduleList";
 import MenuIcon from "../../components/icons/MenuIcon.astro";
 import ReloadIcon from "../../components/icons/ReloadIcon.astro";
 import TimeIcon from "../../components/icons/TimeIcon.astro";
@@ -16,23 +16,10 @@ import DashboardLayout from "../../layouts/DashboardLayout.astro";
   <div class="p-4 max-w-7xl mx-auto">
     <h2 class="text-2xl font-medium mb-4">Schedules</h2>
     <div class="rounded-lg bg-bg-300 border border-border-200">
-      <Schedule
-        name="Personal Website"
-        link="https://github.com/TimWitzdam/witzdam.com-v2"
-        lastBackup="2 minutes ago"
-      >
+      <ScheduleList client:load>
         <MenuIcon />
         <TimeIcon />
-      </Schedule>
-      <Schedule
-        name="Personal Website"
-        link="https://github.com/TimWitzdam/witzdam.com-v2"
-        lastBackup="2 minutes ago"
-        last
-      >
-        <MenuIcon />
-        <TimeIcon />
-      </Schedule>
+      </ScheduleList>
     </div>
   </div>
 </DashboardLayout>

@@ -13,11 +13,24 @@ datasource db {
 model user {
   username String @id
   password String
+  backupJobs backupJob[]
 }
 
-model BackupJob {
+model backupJob {
   id Int @id @default(autoincrement())
   name String
   repository String
-  curl String
+  cron String
+  user user @relation(fields: [username], references: [username])
+  username String
+  backupHistory backupHistory[]
+}
+
+model backupHistory {
+  id Int @id @default(autoincrement())
+  backupJob backupJob @relation(fields: [backupJobId], references: [id])
+  backupJobId Int
+  timestamp DateTime
+  success Boolean
+  message String?
 }
