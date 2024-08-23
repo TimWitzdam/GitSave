@@ -3,6 +3,7 @@ import Layout from "./Layout.astro";
 import GitIcon from "../components/icons/GitIcon.astro";
 import UserIcon from "../components/icons/UserIcon.astro";
 import BurgerMenuIcon from "../components/icons/BurgerMenuIcon.astro";
+import PhoneNavMenu from "../components/PhoneNavMenu";
 
 const links = [
   { name: "Overview", href: "/dashboard" },
@@ -13,23 +14,41 @@ const links = [
 ];
 ---
 
+<script>
+  const phoneMenu = document.querySelector("#phone-nav-menu") as HTMLElement;
+  const burgerMenu = document.querySelector(
+    "#burger-menu"
+  ) as HTMLButtonElement;
+  const closeButton = document.querySelector(
+    "#close-phone-nav-menu"
+  ) as HTMLButtonElement;
+
+  function togglePhoneMenu() {
+    phoneMenu.classList.toggle("opacity-0");
+  }
+
+  burgerMenu.addEventListener("click", togglePhoneMenu);
+  closeButton.addEventListener("click", togglePhoneMenu);
+</script>
+
 <Layout>
   <div class="pt-4 px-4 bg-[#151515] border-b border-border-200">
     <div class="flex items-start justify-between md:mb-4">
       <div
-        class="rounded-lg p-2 flex items-center gap-4 border border-border-100 w-fit mb-4"
+        class="rounded-lg p-2 flex items-center justify-center gap-4 border border-border-100 mb-4 w-12 h-12 md:w-fit md:justify-normal"
       >
         <GitIcon />
         <span class="text-2xl hidden md:inline">GitSave</span>
       </div>
       <div class="flex items-center gap-4">
         <button
-          class="rounded-full border border-border-100 p-3 flex items-center justify-center"
+          class="rounded-full border border-border-100 flex items-center justify-center w-12 h-12"
         >
           <UserIcon />
         </button>
         <button
-          class="rounded-full border border-border-100 p-3 flex items-center justify-center md:hidden"
+          id="burger-menu"
+          class="rounded-full border border-border-100 flex items-center justify-center md:hidden w-12 h-12"
         >
           <BurgerMenuIcon />
         </button>
@@ -53,6 +72,9 @@ const links = [
         }
       </div>
     </div>
+    <PhoneNavMenu {links}>
+      <GitIcon />
+    </PhoneNavMenu>
   </div>
   <div class="py-4 bg-[#151515] border-b border-border-200">
     <div class="px-4 max-w-7xl mx-auto">
