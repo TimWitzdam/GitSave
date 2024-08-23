@@ -47,7 +47,7 @@ export default function ScheduleList(props: Props) {
     return then.toLocaleDateString("de-DE", options);
   }
 
-  React.useEffect(() => {
+  function loadSchedules() {
     const authSessionCookie = getCookie("auth_session");
     fetch("/api/schedules", {
       headers: {
@@ -67,6 +67,11 @@ export default function ScheduleList(props: Props) {
       .catch((error) => {
         console.error(error);
       });
+  }
+
+  React.useEffect(() => {
+    loadSchedules();
+    document.addEventListener("reloadSchedules", loadSchedules);
   }, []);
 
   return (

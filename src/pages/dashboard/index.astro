@@ -6,10 +6,21 @@ import TimeIcon from "../../components/icons/TimeIcon.astro";
 import DashboardLayout from "../../layouts/DashboardLayout.astro";
 ---
 
+<script>
+  const reloadButton = document.getElementById("reload") as HTMLButtonElement;
+
+  reloadButton.addEventListener("click", () => {
+    document.dispatchEvent(new CustomEvent("reloadSchedules"));
+  });
+</script>
+
 <DashboardLayout>
   <div slot="header" class="flex items-center justify-between">
     <h1 class="text-2xl font-medium">Overview</h1>
-    <button class="bg-bg-100 rounded-lg p-3 flex items-center justify-center">
+    <button
+      id="reload"
+      class="bg-bg-100 rounded-lg p-3 flex items-center justify-center"
+    >
       <ReloadIcon />
     </button>
   </div>
