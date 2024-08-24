@@ -1,10 +1,11 @@
 import React from "react";
+import MenuIcon from "../icons/MenuIcon";
+import TimeIcon from "../icons/TimeIcon";
 
 type Props = {
   name: string;
   link: string;
   lastBackup: string;
-  children: React.ReactNode[];
   last?: boolean;
 };
 
@@ -19,10 +20,12 @@ export default function Schedule(props: Props) {
             <span className="text-secondary text-sm">{props.link}</span>
           </div>
         </div>
-        <button className="pl-2">{props.children[0]}</button>
+        <button className="pl-2">
+          <MenuIcon />
+        </button>
       </div>
       <div className="flex items-center gap-2">
-        {props.children[1]}
+        <TimeIcon />
         <span className="text-secondary text-sm">
           Last backup: {props.lastBackup}
         </span>

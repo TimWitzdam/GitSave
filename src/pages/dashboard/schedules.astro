@@ -1,8 +1,6 @@
 ---
 import AddSchedulePopup from "../../components/dashboard/AddSchedulePopup";
 import ScheduleList from "../../components/dashboard/ScheduleList";
-import MenuIcon from "../../components/icons/MenuIcon.astro";
-import TimeIcon from "../../components/icons/TimeIcon.astro";
 import DashboardLayout from "../../layouts/DashboardLayout.astro";
 ---
 
@@ -41,10 +39,7 @@ import DashboardLayout from "../../layouts/DashboardLayout.astro";
   </div>
   <div class="p-4 max-w-7xl mx-auto">
     <div class="rounded-lg bg-bg-300 border border-border-200">
-      <ScheduleList client:load>
-        <MenuIcon />
-        <TimeIcon />
-      </ScheduleList>
+      <ScheduleList client:load />
     </div>
   </div>
   <AddSchedulePopup client:load />

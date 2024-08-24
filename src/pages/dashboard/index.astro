@@ -1,8 +1,6 @@
 ---
 import ScheduleList from "../../components/dashboard/ScheduleList";
-import MenuIcon from "../../components/icons/MenuIcon.astro";
-import ReloadIcon from "../../components/icons/ReloadIcon.astro";
-import TimeIcon from "../../components/icons/TimeIcon.astro";
+import ReloadIcon from "../../components/icons/ReloadIcon";
 import DashboardLayout from "../../layouts/DashboardLayout.astro";
 ---
 
@@ -27,10 +25,7 @@ import DashboardLayout from "../../layouts/DashboardLayout.astro";
   <div class="p-4 max-w-7xl mx-auto">
     <h2 class="text-2xl font-medium mb-4">Schedules</h2>
     <div class="rounded-lg bg-bg-300 border border-border-200">
-      <ScheduleList client:load>
-        <MenuIcon />
-        <TimeIcon />
-      </ScheduleList>
+      <ScheduleList client:load />
     </div>
   </div>
 </DashboardLayout>

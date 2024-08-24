@@ -2,11 +2,7 @@ import React from "react";
 import Schedule from "./Schedule";
 import type { ScheduleWithHistory } from "../../types/scheduleTypes";
 
-type Props = {
-  children: React.ReactNode[];
-};
-
-export default function ScheduleList(props: Props) {
+export default function ScheduleList() {
   const [schedules, setSchedules] = React.useState<ScheduleWithHistory[]>([]);
 
   function timeAgo(timestamp: string) {
@@ -74,9 +70,7 @@ export default function ScheduleList(props: Props) {
           name={schedule.name}
           link={schedule.repository}
           lastBackup={schedule.backupHistory[0]?.timestamp || "Never"}
-        >
-          {props.children}
-        </Schedule>
+        />
       ))}
     </div>
   );

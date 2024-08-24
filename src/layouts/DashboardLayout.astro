@@ -1,8 +1,8 @@
 ---
 import Layout from "./Layout.astro";
-import GitIcon from "../components/icons/GitIcon.astro";
-import UserIcon from "../components/icons/UserIcon.astro";
-import BurgerMenuIcon from "../components/icons/BurgerMenuIcon.astro";
+import GitIcon from "../components/icons/GitIcon";
+import UserIcon from "../components/icons/UserIcon";
+import BurgerMenuIcon from "../components/icons/BurgerMenuIcon";
 import PhoneNavMenu from "../components/PhoneNavMenu";
 
 const links = [
@@ -73,9 +73,7 @@ const links = [
         }
       </div>
     </div>
-    <PhoneNavMenu {links}>
-      <GitIcon />
-    </PhoneNavMenu>
+    <PhoneNavMenu {links} />
   </div>
   <div class="py-4 bg-[#151515] border-b border-border-200">
     <div class="px-4 max-w-7xl mx-auto">

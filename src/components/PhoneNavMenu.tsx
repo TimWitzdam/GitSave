@@ -1,8 +1,8 @@
 import React from "react";
+import GitIcon from "./icons/GitIcon";
 
 type Props = {
   links: { name: string; href: string }[];
-  children: React.ReactNode;
 };
 
 export default function PhoneNavMenu(props: Props) {
@@ -13,7 +13,7 @@ export default function PhoneNavMenu(props: Props) {
     >
       <div className="p-4 flex items-start justify-between md:mb-4">
         <div className="rounded-lg p-2 flex items-center justify-center gap-4 border border-border-100 mb-4 w-12 h-12">
-          {props.children}
+          <GitIcon />
         </div>
         <div className="flex items-center gap-4">
           <button
