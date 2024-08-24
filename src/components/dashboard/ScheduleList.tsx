@@ -43,8 +43,15 @@ export default function ScheduleList() {
         "Content-Type": "application/json",
       },
     })
-      .then((r) => r.json())
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          console.error("Failed to load schedules");
+        }
+      })
       .then((schedules) => {
+        if (!schedules) return;
         schedules.forEach((schedule: ScheduleWithHistory) => {
           schedule.backupHistory.forEach((history) => {
             history.timestamp = timeAgo(history.timestamp);
