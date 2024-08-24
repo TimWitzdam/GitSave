@@ -9,12 +9,6 @@ type Props = {
 export default function ScheduleList(props: Props) {
   const [schedules, setSchedules] = React.useState<ScheduleWithHistory[]>([]);
 
-  function getCookie(name: string) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()?.split(";").shift();
-  }
-
   function timeAgo(timestamp: string) {
     const now = new Date().getTime();
     const then = new Date(timestamp);
@@ -48,11 +42,9 @@ export default function ScheduleList(props: Props) {
   }
 
   function loadSchedules() {
-    const authSessionCookie = getCookie("auth_session");
     fetch("/api/schedules", {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${authSessionCookie}`,
       },
     })
       .then((r) => r.json())
@@ -81,7 +73,7 @@ export default function ScheduleList(props: Props) {
           key={schedule.id}
           name={schedule.name}
           link={schedule.repository}
-          lastBackup={schedule.backupHistory[0].timestamp}
+          lastBackup={schedule.backupHistory[0]?.timestamp || "Never"}
         >
           {props.children}
         </Schedule>
