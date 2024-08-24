@@ -10,12 +10,31 @@ const JWT_SECRET = process.env.JWT_SECRET;
 app.use(express.json());
 app.use(express.static("dist")); // Astro static build
 
+function getCookie(cookies, name) {
+  const value = `; ${cookies}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(";").shift();
+}
+
+function createCronExpression(every, timespan) {
+  const currentDate = new Date();
+  const currentHour = currentDate.getHours();
+  const currentMinute = currentDate.getMinutes();
+
+  switch (timespan) {
+    case "minutes":
+      return `*/${every} * * * *`;
+    case "hours":
+      return `${currentMinute} */${every} * * *`;
+    case "days":
+      return `${currentMinute} ${currentHour} */${every} * *`;
+  }
+}
+
 const authenticateJWT = (req, res, next) => {
-  const authHeader = req.headers.authorization;
+  const token = getCookie(req.headers.cookie, "auth_session");
 
-  if (authHeader) {
-    const token = authHeader.split(" ")[1];
-
+  if (token) {
     jwt.verify(token, JWT_SECRET, (err, user) => {
       if (err) {
         return res.status(403).json({ message: "Invalid token" });
@@ -91,8 +110,22 @@ app.get("/api/schedules", authenticateJWT, (req, res) => {
 app.post("/api/schedules", authenticateJWT, (req, res) => {
   const schedule = req.body;
 
-  if (!schedule.cron.match(/^(\d+|\*) (\d+|\*) (\d+|\*) (\d+|\*) (\d+|\*)$/)) {
-    return res.status(400).send("Invalid cron expression");
+  if (
+    !schedule.name ||
+    !schedule.repository ||
+    !schedule.every ||
+    !schedule.timespan
+  ) {
+    return res.status(400).send("Missing required fields");
+  }
+
+  if (
+    (schedule.timespan !== "minutes" &&
+      schedule.timespan !== "hours" &&
+      schedule.timespan !== "days") ||
+    schedule.every <= 0
+  ) {
+    return res.status(400).send("Invalid schedule");
   }
 
   let url;
@@ -103,7 +136,47 @@ app.post("/api/schedules", authenticateJWT, (req, res) => {
     return res.status(400).send("Invalid repository URL");
   }
 
-  execFile("git", ["ls-remote", url.href]).on("exit", (code) => {
+  const child = execFile(
+    "git",
+    ["ls-remote", url.href],
+    (error, stdout, stderr) => {
+      if (error) {
+        if (error.killed) {
+          return res
+            .status(500)
+            .send("The process took too long and was aborted.");
+        }
+        return res
+          .status(400)
+          .send(
+            "Invalid repository. Either it does not exist or you do not have access to it."
+          );
+      }
+
+      prisma.backupJob
+        .create({
+          data: {
+            name: schedule.name,
+            repository: schedule.repository,
+            cron: createCronExpression(schedule.every, schedule.timespan),
+            username: req.user.username,
+          },
+        })
+        .then((schedule) => {
+          return res.json(schedule);
+        })
+        .catch((error) => {
+          return res.status(500).send("Internal server error");
+        });
+    }
+  );
+
+  const timeout = setTimeout(() => {
+    child.kill();
+  }, 5000);
+
+  child.on("exit", (code) => {
+    clearTimeout(timeout);
     if (code !== 0) {
       return res
         .status(400)
@@ -111,20 +184,6 @@ app.post("/api/schedules", authenticateJWT, (req, res) => {
           "Invalid repository. Either it does not exist or you do not have access to it."
         );
     }
-
-    prisma.backupJob
-      .create({
-        data: {
-          ...schedule,
-          username: req.user.username,
-        },
-      })
-      .then((schedule) => {
-        return res.json(schedule);
-      })
-      .catch((error) => {
-        return res.status(500).send("Internal server error");
-      });
   });
 });
 

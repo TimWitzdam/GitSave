@@ -1,0 +1,51 @@
+---
+import AddSchedulePopup from "../../components/dashboard/AddSchedulePopup";
+import ScheduleList from "../../components/dashboard/ScheduleList";
+import MenuIcon from "../../components/icons/MenuIcon.astro";
+import TimeIcon from "../../components/icons/TimeIcon.astro";
+import DashboardLayout from "../../layouts/DashboardLayout.astro";
+---
+
+<script>
+  const addSchedulePopup = document.getElementById(
+    "add-schedule"
+  ) as HTMLDivElement;
+  const addButton = document.getElementById("add") as HTMLButtonElement;
+  const cancelButton = document.getElementById(
+    "cancel-add"
+  ) as HTMLButtonElement;
+  const closeButton = document.getElementById("close-add") as HTMLButtonElement;
+
+  function toggleAddSchedulePopup() {
+    addSchedulePopup.classList.toggle("opacity-0");
+    addSchedulePopup.classList.toggle("pointer-events-none");
+  }
+
+  addButton.addEventListener("click", toggleAddSchedulePopup);
+  cancelButton.addEventListener("click", toggleAddSchedulePopup);
+  closeButton.addEventListener("click", () => {
+    location.reload();
+    return false;
+  });
+</script>
+
+<DashboardLayout>
+  <div slot="header" class="flex items-center justify-between">
+    <h1 class="text-2xl font-medium">Schedules</h1>
+    <button
+      id="add"
+      class="bg-bg-100 rounded-lg p-3 flex items-center justify-center"
+    >
+      Add schedule
+    </button>
+  </div>
+  <div class="p-4 max-w-7xl mx-auto">
+    <div class="rounded-lg bg-bg-300 border border-border-200">
+      <ScheduleList client:load>
+        <MenuIcon />
+        <TimeIcon />
+      </ScheduleList>
+    </div>
+  </div>
+  <AddSchedulePopup client:load />
+</DashboardLayout>
