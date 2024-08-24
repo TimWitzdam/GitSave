@@ -24,7 +24,8 @@ const links = [
   ) as HTMLButtonElement;
 
   function togglePhoneMenu() {
-    phoneMenu.classList.toggle("opacity-0 pointer-events-none");
+    phoneMenu.classList.toggle("opacity-0");
+    phoneMenu.classList.toggle("pointer-events-none");
   }
 
   burgerMenu.addEventListener("click", togglePhoneMenu);
