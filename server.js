@@ -187,6 +187,50 @@ app.post("/api/schedules", authenticateJWT, (req, res) => {
   });
 });
 
+app.get("/api/history", authenticateJWT, (req, res) => {
+  const { limit, offset } = req.query;
+
+  if (limit === undefined || offset === undefined || limit <= 0 || offset < 0) {
+    return res.status(400).send("Invalid limit or offset");
+  }
+
+  Promise.all([
+    prisma.backupHistory.findMany({
+      where: {
+        backupJob: {
+          username: req.user.username,
+        },
+      },
+      orderBy: {
+        timestamp: "desc",
+      },
+      skip: parseInt(offset),
+      take: parseInt(limit),
+      include: {
+        backupJob: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    }),
+    prisma.backupHistory.count({
+      where: {
+        backupJob: {
+          username: req.user.username,
+        },
+      },
+    }),
+  ])
+    .then(([backupHistory, totalCount]) => {
+      return res.json({ backupHistory, totalCount });
+    })
+    .catch((error) => {
+      console.log(error);
+      return res.status(500).send("Internal server error");
+    });
+});
+
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });

@@ -1,0 +1,20 @@
+---
+import HistoryList from "../../components/dashboard/HistoryList";
+import ReloadIcon from "../../components/icons/ReloadIcon";
+import DashboardLayout from "../../layouts/DashboardLayout.astro";
+---
+
+<DashboardLayout>
+  <div slot="header" class="flex items-center justify-between">
+    <h1 class="text-2xl font-medium">History</h1>
+    <button
+      id="reload-button"
+      class="bg-bg-100 rounded-lg p-3 flex items-center justify-center"
+    >
+      <ReloadIcon />
+    </button>
+  </div>
+  <div class="p-4 max-w-7xl mx-auto">
+    <HistoryList client:load />
+  </div>
+</DashboardLayout>
