@@ -6,11 +6,11 @@ import BurgerMenuIcon from "../components/icons/BurgerMenuIcon";
 import PhoneNavMenu from "../components/PhoneNavMenu";
 
 const links = [
-  { name: "Overview", href: "/dashboard" },
-  { name: "Schedules", href: "/dashboard/schedules" },
-  { name: "History", href: "/dashboard/history" },
-  { name: "Settings", href: "/dashboard/settings" },
-  { name: "About", href: "/dashboard/about" },
+  { name: "Overview", href: "/dashboard/" },
+  { name: "Schedules", href: "/dashboard/schedules/" },
+  { name: "History", href: "/dashboard/history/" },
+  { name: "Settings", href: "/dashboard/settings/" },
+  { name: "About", href: "/dashboard/about/" },
 ];
 ---
 
@@ -33,6 +33,7 @@ const links = [
 
   const links = document.querySelectorAll(".nav-link");
   const currentPath = window.location.pathname;
+  console.log(currentPath);
 
   links.forEach((link) => {
     if (link.getAttribute("href") === currentPath) {

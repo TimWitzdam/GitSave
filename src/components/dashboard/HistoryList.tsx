@@ -2,13 +2,18 @@ import React from "react";
 import History from "./History";
 import type { ScheduleHistory } from "../../types/scheduleTypes";
 import Pagination from "../Pagination/Pagination";
+import BaseButton from "../BaseButton";
 
-export default function HistoryList() {
+type Props = {
+  disablePaging?: boolean;
+};
+
+export default function HistoryList({ disablePaging = false }: Props) {
   const [history, setHistory] = React.useState<ScheduleHistory[]>([]);
   const [total, setTotal] = React.useState(0);
   const [currentPage, setCurrentPage] = React.useState(1);
   const [fetched, setFetched] = React.useState(false);
-  const perPage = 4;
+  const perPage = disablePaging ? 5 : 10;
 
   function fetchHistory(limit: number, offset: number) {
     fetch(`/api/history?limit=${limit}&offset=${offset}`)
@@ -26,27 +31,31 @@ export default function HistoryList() {
   }
 
   React.useEffect(() => {
-    const reloadButton = document.getElementById(
-      "reload-button"
-    ) as HTMLButtonElement;
+    let offset = 0;
+    const reloadButton = document.getElementById("reload") as HTMLButtonElement;
 
     reloadButton.addEventListener("click", () => {
       fetchHistory(perPage, offset);
     });
 
-    setCurrentPage(
-      location.search ? parseInt(location.search.split("?page=")[1]) : 1
-    );
-    const tmp = location.search
-      ? parseInt(location.search.split("?page=")[1])
-      : 1;
-    const offset = tmp === 1 ? 0 : tmp * perPage - perPage;
+    if (!disablePaging) {
+      setCurrentPage(
+        location.search ? parseInt(location.search.split("?page=")[1]) : 1
+      );
+      const tmp = location.search
+        ? parseInt(location.search.split("?page=")[1])
+        : 1;
+      offset = tmp === 1 ? 0 : tmp * perPage - perPage;
+    }
+
     fetchHistory(perPage, offset);
   }, []);
 
   return (
     <div>
-      <div className="rounded-lg bg-bg-300 border border-border-200 mb-4">
+      <div
+        className={`rounded-lg bg-bg-300 border border-border-200 ${!disablePaging && "mb-4"}`}
+      >
         {history.map((item, index) => (
           <History
             key={item.id}
@@ -54,11 +63,16 @@ export default function HistoryList() {
             name={item.backupJob.name}
             success={item.success}
             message={item.message}
-            last={index === history.length - 1}
+            last={!disablePaging && index === history.length - 1}
           />
         ))}
+        {disablePaging && (
+          <a href="/dashboard/history" className="m-4 block w-fit">
+            <BaseButton type="secondary">Show all</BaseButton>
+          </a>
+        )}
       </div>
-      {fetched && total > perPage && (
+      {!disablePaging && fetched && total > perPage && (
         <Pagination
           currentPage={currentPage}
           totalItems={total}
