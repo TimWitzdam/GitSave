@@ -166,6 +166,89 @@ app.post("/api/schedules", authenticateJWT, (req, res) => {
   });
 });
 
+app.put("/api/schedules/:id", authenticateJWT, (req, res) => {
+  const { id } = req.params;
+  const schedule = req.body;
+
+  if (
+    !schedule.name ||
+    !schedule.repository ||
+    !schedule.every ||
+    !schedule.timespan
+  ) {
+    return res.status(400).send("Missing required fields");
+  }
+
+  if (
+    (schedule.timespan !== "minutes" &&
+      schedule.timespan !== "hours" &&
+      schedule.timespan !== "days") ||
+    schedule.every <= 0
+  ) {
+    return res.status(400).send("Invalid schedule");
+  }
+
+  let url;
+
+  try {
+    url = new URL(schedule.repository);
+  } catch (error) {
+    return res.status(400).send("Invalid repository URL");
+  }
+
+  const child = execFile(
+    "git",
+    ["ls-remote", url.href],
+    (error, stdout, stderr) => {
+      if (error) {
+        if (error.killed) {
+          return res
+            .status(500)
+            .send("The process took too long and was aborted.");
+        }
+        return res
+          .status(400)
+          .send(
+            "Invalid repository. Either it does not exist or you do not have access to it."
+          );
+      }
+
+      prisma.backupJob
+        .update({
+          where: {
+            id: parseInt(id),
+          },
+          data: {
+            name: schedule.name,
+            repository: schedule.repository,
+            cron: createCronExpression(schedule.every, schedule.timespan),
+          },
+        })
+        .then((schedule) => {
+          return res.json(schedule);
+        })
+        .catch((error) => {
+          return res.status(500).send("Internal server error");
+        });
+    }
+  );
+
+  const timeout = setTimeout(() => {
+    child.kill();
+  }, 5000);
+
+  child.on("exit", (code) => {
+    clearTimeout(timeout);
+    if (code !== 0) {
+      return res
+        .status(400)
+        .send(
+          "Invalid repository. Either it does not exist or you do not have access to it."
+        );
+    }
+  });
+});
+
 app.get("/api/history", authenticateJWT, (req, res) => {
   const { limit, offset } = req.query;
 

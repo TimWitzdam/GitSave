@@ -2,11 +2,42 @@ import React from "react";
 import BaseInput from "../BaseInput";
 import BaseButton from "../BaseButton";
 
-export default function AddSchedulePopup() {
-  const [every, setEvery] = React.useState(1);
+type Props = {
+  id: number;
+  name: string;
+  cron: string;
+  repository: string;
+  closeEdit: () => void;
+};
+
+export default function EditSchedulePopup(props: Props) {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState(false);
+  const [name, setName] = React.useState(props.name);
+  const [repository, setRepository] = React.useState(props.repository);
+
+  const extractedCronParams = extractCronParameters(props.cron);
+  const [every, setEvery] = React.useState(extractedCronParams.every);
+  const [timespan, setTimespan] = React.useState(extractedCronParams.timespan);
+
+  function extractCronParameters(cronExpression: string) {
+    const parts = cronExpression.split(" ");
+
+    if (parts.length !== 5) {
+      throw new Error("Invalid cron expression");
+    }
+
+    if (parts[0].includes("/")) {
+      return { every: parseInt(parts[0].split("/")[1]), timespan: "minutes" };
+    } else if (parts[1].includes("/")) {
+      return { every: parseInt(parts[1].split("/")[1]), timespan: "hours" };
+    } else if (parts[2].includes("/")) {
+      return { every: parseInt(parts[2].split("/")[1]), timespan: "days" };
+    } else {
+      throw new Error("Unable to determine timespan from cron expression");
+    }
+  }
 
   function updateEvery(e: React.ChangeEvent<HTMLInputElement>) {
     if (parseInt(e.target.value) < 1) {
@@ -28,8 +59,8 @@ export default function AddSchedulePopup() {
     const timespan = formData.get("timespan") as string;
 
     setLoading(true);
-    fetch("/api/schedules", {
-      method: "POST",
+    fetch(`/api/schedules/${props.id}`, {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
@@ -51,15 +82,15 @@ export default function AddSchedulePopup() {
 
   return (
     <div
-      id="add-schedule"
-      className="p-4 opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 bg-black bg-opacity-50 grid place-content-center transition-opacity duration-300 z-50"
+      id="edit-schedule"
+      className="p-4 fixed w-full h-full top-0 left-0 bg-black bg-opacity-50 grid place-content-center z-50"
     >
       <form
         onSubmit={handleSubmit}
         action="submit"
         className={`${success && "hidden"} rounded-lg bg-black border border-border-200 md:w-96`}
       >
-        <h2 className="text-2xl font-medium p-4">Add schedule</h2>
+        <h2 className="text-2xl font-medium p-4">Edit schedule</h2>
         <div className="bg-bg-200 p-4 border-y border-border-200">
           <div className="flex flex-col gap-6">
             <BaseInput
@@ -67,6 +98,8 @@ export default function AddSchedulePopup() {
               label="Name"
               placeholder="Enter schedule name"
               name="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               required
             />
             <BaseInput
@@ -74,6 +107,8 @@ export default function AddSchedulePopup() {
               label="Repository link"
               placeholder="https://github.com/exampleuser/examperepo.git"
               name="repository"
+              value={repository}
+              onChange={(e) => setRepository(e.target.value)}
               required
             />
             <div>
@@ -95,6 +130,8 @@ export default function AddSchedulePopup() {
                 <select
                   name="timespan"
                   className="outline-none w-full rounded-lg bg-bg-300 border-2 border-border-200 text-center py-3 px-4 text-secondary focus:border-border-100 transition-colors"
+                  value={timespan}
+                  onChange={(e) => setTimespan(e.target.value)}
                 >
                   <option value="minutes">
                     Minute{every === 0 || every > 1 ? "s" : ""}
@@ -112,7 +149,12 @@ export default function AddSchedulePopup() {
           </div>
         </div>
         <div className="p-4 flex items-center justify-between">
-          <BaseButton id="cancel-add" type="secondary" buttonType="reset">
+          <BaseButton
+            id="cancel-edit"
+            type="secondary"
+            buttonType="reset"
+            onClick={props.closeEdit}
+          >
             Cancel
           </BaseButton>
           <BaseButton buttonType="submit">
@@ -137,12 +179,12 @@ export default function AddSchedulePopup() {
       <div
         className={`${!success && "hidden"} rounded-lg bg-black border border-border-200`}
       >
-        <h2 className="text-2xl font-medium p-4">Schedule added</h2>
+        <h2 className="text-2xl font-medium p-4">Schedule edited</h2>
         <div className="bg-bg-200 p-4 border-t border-border-200">
           <p className="text-secondary mb-4">
-            Your schedule has been added successfully.
+            Your schedule has been edited successfully.
           </p>
-          <BaseButton fullWidth id="close-add">
+          <BaseButton fullWidth id="close-edit" onClick={props.closeEdit}>
             Close
           </BaseButton>
         </div>

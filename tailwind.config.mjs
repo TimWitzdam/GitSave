@@ -17,6 +17,7 @@ export default {
         secondary: "#969699",
         red: "#FF453A",
         green: "#30D158",
+        orange: "#FF9F0A",
       },
     },
   },
