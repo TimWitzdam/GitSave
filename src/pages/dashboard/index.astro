@@ -25,11 +25,11 @@ import DashboardLayout from "../../layouts/DashboardLayout.astro";
   </div>
   <div class="p-4 max-w-7xl mx-auto">
     <h2 class="text-2xl font-medium mb-4">Schedules</h2>
-    <div class="rounded-lg bg-bg-300 border border-border-200 mb-6">
+    <div class="mb-6">
       <ScheduleList client:load />
     </div>
     <h2 class="text-2xl font-medium mb-4">History</h2>
-    <div class="rounded-lg bg-bg-300 border border-border-200">
+    <div>
       <HistoryList disablePaging client:load />
     </div>
   </div>
