@@ -5,18 +5,12 @@ import jwt from "jsonwebtoken";
 import { execFile } from "child_process";
 import cron from "node-cron";
 import fs from "fs";
+import { authenticateJWT } from "./src/middleware/authenticateJWT.js";
 
 const app = express();
 const PORT = 3000;
 const JWT_SECRET = process.env.JWT_SECRET;
 app.use(express.json());
-app.use(express.static("dist")); // Astro static build
-
-function getCookie(cookies, name) {
-  const value = `; ${cookies}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop()?.split(";").shift();
-}
 
 function createCronExpression(every, timespan) {
   const currentDate = new Date();
@@ -32,23 +26,6 @@ function createCronExpression(every, timespan) {
       return `${currentMinute} ${currentHour} */${every} * *`;
   }
 }
-
-const authenticateJWT = (req, res, next) => {
-  const token = getCookie(req.headers.cookie, "auth_session");
-
-  if (token) {
-    jwt.verify(token, JWT_SECRET, (err, user) => {
-      if (err) {
-        return res.status(403).json({ message: "Invalid token" });
-      }
-
-      req.user = user;
-      next();
-    });
-  } else {
-    res.status(401).json({ message: "No token provided" });
-  }
-};
 
 app.post("/api/login", (req, res) => {
   const username = req.body.username;
@@ -246,6 +223,7 @@ function createHistoryEntry(data) {
       return false;
     });
 }
+
 function createBackup(id, name, repository) {
   let backupJobData = {};
   const currentTimestamp = Math.floor(Date.now() / 1000);
@@ -323,6 +301,18 @@ prisma.backupJob
   .catch((error) => {
     console.log(error);
   });
+
+app.use(
+  "/dashboard",
+  (req, res, next) => authenticateJWT(req, res, next, false),
+  express.static("dist/dashboard")
+);
+app.use(
+  "/login",
+  (req, res, next) => authenticateJWT(req, res, next, true),
+  express.static("dist/login")
+);
+app.use(express.static("dist"));
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);

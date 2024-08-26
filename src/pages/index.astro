@@ -1,10 +1,22 @@
 ---
-const sessionToken = Astro.cookies.get("auth_session")?.value;
 
-if (!sessionToken) {
-  return Astro.redirect("/login");
-}
 ---
+
+<script>
+  function getCookie(cookies: string, name: string) {
+    const value = `; ${cookies}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(";").shift();
+  }
+
+  const cookies = document.cookie;
+
+  if (getCookie(cookies, "auth_session")) {
+    location.href = "/dashboard";
+  } else {
+    location.href = "/login";
+  }
+</script>
 
 <html lang="en">
   <head>
