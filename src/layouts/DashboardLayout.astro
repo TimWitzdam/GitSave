@@ -30,6 +30,15 @@ const links = [
 
   burgerMenu.addEventListener("click", togglePhoneMenu);
   closeButton.addEventListener("click", togglePhoneMenu);
+
+  const links = document.querySelectorAll(".nav-link");
+  const currentPath = window.location.pathname;
+
+  links.forEach((link) => {
+    if (link.getAttribute("href") === currentPath) {
+      link.classList.add("border-border-100", "text-white", "bg-border-200");
+    }
+  });
 </script>
 
 <Layout>
@@ -61,11 +70,7 @@ const links = [
           links.map((link) => (
             <a
               href={link.href}
-              class={`px-4 py-2 rounded-t-lg text-secondary border-t border-x border-transparent hover:border-border-100 hover:text-white hover:bg-border-200 transition-colors${
-                link.href === Astro.url.pathname
-                  ? "border-border-100 text-white bg-border-200 "
-                  : ""
-              }`}
+              class="nav-link px-4 py-2 rounded-t-lg text-secondary border-t border-x border-transparent hover:border-border-100 hover:text-white hover:bg-border-200 transition-colors"
             >
               {link.name}
             </a>
