@@ -45,7 +45,6 @@ export default function AddSchedulePopup() {
       .then((data) => {
         setLoading(false);
         if (!data) return;
-        console.log(data);
         setSuccess(true);
       });
   }
