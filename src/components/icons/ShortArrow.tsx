@@ -2,7 +2,7 @@ type Props = {
   size?: number;
 };
 
-export default function GitIcon({ size = 8 }: Props) {
+export default function ShortArrow({ size = 8 }: Props) {
   return (
     <svg
       width={size}
