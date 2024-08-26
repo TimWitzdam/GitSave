@@ -3,6 +3,8 @@ import bcrypt from "bcryptjs";
 import prisma from "./prisma/client.js";
 import jwt from "jsonwebtoken";
 import { execFile } from "child_process";
+import cron from "node-cron";
+import fs from "fs";
 
 const app = express();
 const PORT = 3000;
@@ -230,6 +232,97 @@ app.get("/api/history", authenticateJWT, (req, res) => {
       return res.status(500).send("Internal server error");
     });
 });
+
+function createHistoryEntry(data) {
+  prisma.backupHistory
+    .create({
+      data: data,
+    })
+    .then((schedule) => {
+      return true;
+    })
+    .catch((error) => {
+      console.error(error);
+      return false;
+    });
+}
+function createBackup(id, name, repository) {
+  let backupJobData = {};
+  const currentTimestamp = Math.floor(Date.now() / 1000);
+  const child = execFile(
+    "git",
+    ["clone", "--mirror", repository, `./backups/${id}/${currentTimestamp}`],
+    (error, stdout, stderr) => {
+      if (error) {
+        if (error.killed) {
+          backupJobData = {
+            backupJobId: id,
+            success: false,
+            message: "Request took too long",
+          };
+        } else {
+          backupJobData = {
+            backupJobId: id,
+            success: false,
+            message: "Missing privileges or cannot access",
+          };
+        }
+      } else {
+        backupJobData = {
+          backupJobId: id,
+          success: true,
+        };
+        fs.readdir(`./backups/${id}/`, (err, files) => {
+          if (files.length >= 2) {
+            const oldFiles = files.filter((f) => f != currentTimestamp);
+            for (const oldFile of oldFiles) {
+              fs.rmSync(`./backups/${id}/${oldFile}`, {
+                recursive: true,
+                force: true,
+              });
+            }
+          }
+        });
+      }
+
+      createHistoryEntry(backupJobData);
+    }
+  );
+
+  const timeout = setTimeout(() => {
+    child.kill();
+  }, 15000);
+
+  child.on("exit", (code) => {
+    clearTimeout(timeout);
+    if (code === null) {
+      backupJobData = {
+        backupJobId: id,
+        success: false,
+        message: "Request took too long",
+      };
+      createHistoryEntry(backupJobData);
+    }
+  });
+}
+
+prisma.backupJob
+  .findMany()
+  .then((backupJobs) => {
+    console.log(
+      `Scheduling ${backupJobs.length} backup job${backupJobs.length === 0 || (backupJobs.length > 1 ? "s" : "")}`
+    );
+    for (const job of backupJobs) {
+      cron.schedule(job.cron, () => {
+        console.log(`Creating backup of ${job.name}`);
+        createBackup(job.id, job.name, job.repository);
+        console.log("Finished backup");
+      });
+    }
+  })
+  .catch((error) => {
+    console.log(error);
+  });
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);

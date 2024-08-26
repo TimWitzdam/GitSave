@@ -30,7 +30,7 @@ model backupHistory {
   id Int @id @default(autoincrement())
   backupJob backupJob @relation(fields: [backupJobId], references: [id])
   backupJobId Int
-  timestamp DateTime
+  timestamp DateTime @default(now())
   success Boolean
   message String?
 }
