@@ -1,4 +1,4 @@
-import React from "react";
+import { formatTimestamp } from "../../lib/formatTimestamp";
 
 type Props = {
   timestamp: string;
@@ -11,7 +11,9 @@ type Props = {
 export default function History(props: Props) {
   return (
     <div className={`p-4 ${props.last ? "" : "border-b border-border-200"}`}>
-      <p className="text-secondary text-sm">{props.timestamp}</p>
+      <p className="text-secondary text-sm">
+        {formatTimestamp(props.timestamp)}
+      </p>
       <p className="mb-2 mt-1">{props.name}</p>
       <div className="flex items-center gap-2">
         <div

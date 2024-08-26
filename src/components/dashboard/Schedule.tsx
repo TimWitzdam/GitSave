@@ -1,4 +1,4 @@
-import React from "react";
+import { formatTimestamp } from "../../lib/formatTimestamp";
 import MenuIcon from "../icons/MenuIcon";
 import TimeIcon from "../icons/TimeIcon";
 
@@ -27,7 +27,7 @@ export default function Schedule(props: Props) {
       <div className="flex items-center gap-2">
         <TimeIcon />
         <span className="text-secondary text-sm">
-          Last backup: {props.lastBackup}
+          Last backup: {formatTimestamp(props.lastBackup)}
         </span>
       </div>
     </div>
