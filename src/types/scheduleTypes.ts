@@ -17,4 +17,6 @@ export type ScheduleHistory = {
   message: string | null;
 };
 
-export type ScheduleWithHistory = Schedule & { backupHistory: ScheduleHistory };
+export type ScheduleWithHistory = Schedule & {
+  backupHistory: ScheduleHistory[];
+};
