@@ -249,6 +249,31 @@ app.put("/api/schedules/:id", authenticateJWT, (req, res) => {
   });
 });
 
+app.post("/api/schedules/:id/backup", authenticateJWT, (req, res) => {
+  const { id } = req.params;
+
+  prisma.backupJob
+    .findUnique({
+      where: {
+        id: parseInt(id),
+      },
+    })
+    .then((backupJob) => {
+      if (!backupJob) {
+        return res.status(404).send("Backup job not found");
+      }
+
+      createBackup(backupJob.id, backupJob.name, backupJob.repository);
+      return res.send(
+        "Backup started. Depending on the size of the repository, this may take a while."
+      );
+    })
+    .catch((error) => {
+      console.log(error);
+      return res.status(500).send("Internal server error");
+    });
+});
+
 app.get("/api/history", authenticateJWT, (req, res) => {
   const { limit, offset } = req.query;
 

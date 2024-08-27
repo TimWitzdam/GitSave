@@ -54,7 +54,10 @@ export default function Schedule(props: Props) {
             >
               Edit
             </button>
-            <button className="text-left rounded-lg hover:bg-bg-100 transition-colors p-2 px-4 w-full whitespace-nowrap">
+            <button
+              onClick={props.backupNowClick}
+              className="text-left rounded-lg hover:bg-bg-100 transition-colors p-2 px-4 w-full whitespace-nowrap"
+            >
               Backup now
             </button>
             <button className="text-left rounded-lg text-orange hover:bg-bg-100 transition-colors p-2 px-4 w-full whitespace-nowrap">
