@@ -314,6 +314,24 @@ app.put("/api/schedules/:id/resume", authenticateJWT, (req, res) => {
     });
 });
 
+app.delete("/api/schedules/:id", authenticateJWT, (req, res) => {
+  const { id } = req.params;
+
+  prisma.backupJob
+    .delete({
+      where: {
+        id: parseInt(id),
+      },
+    })
+    .then(() => {
+      return res.send("Schedule deleted");
+    })
+    .catch((error) => {
+      console.log(error);
+      return res.status(500).send("Internal server error");
+    });
+});
+
 app.get("/api/history", authenticateJWT, (req, res) => {
   const { limit, offset } = req.query;
 
@@ -324,9 +342,16 @@ app.get("/api/history", authenticateJWT, (req, res) => {
   Promise.all([
     prisma.backupHistory.findMany({
       where: {
-        backupJob: {
-          username: req.user.username,
-        },
+        OR: [
+          {
+            backupJob: {
+              username: req.user.username,
+            },
+          },
+          {
+            backupJob: null,
+          },
+        ],
       },
       orderBy: {
         timestamp: "desc",
@@ -343,9 +368,16 @@ app.get("/api/history", authenticateJWT, (req, res) => {
     }),
     prisma.backupHistory.count({
       where: {
-        backupJob: {
-          username: req.user.username,
-        },
+        OR: [
+          {
+            backupJob: {
+              username: req.user.username,
+            },
+          },
+          {
+            backupJob: null,
+          },
+        ],
       },
     }),
   ])

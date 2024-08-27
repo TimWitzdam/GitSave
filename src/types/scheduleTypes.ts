@@ -10,7 +10,7 @@ export type Schedule = {
 export type ScheduleHistory = {
   id: number;
   backupJobId: number;
-  backupJob: {
+  backupJob?: {
     name: string;
   };
   timestamp: string;

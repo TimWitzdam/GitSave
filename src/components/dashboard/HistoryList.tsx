@@ -82,7 +82,7 @@ export default function HistoryList({ disablePaging = false }: Props) {
             <History
               key={item.id}
               timestamp={item.timestamp}
-              name={item.backupJob.name}
+              name={item.backupJob ? item.backupJob.name : "Deleted schedule"}
               success={item.success}
               message={item.message}
               last={!disablePaging && index === history.length - 1}

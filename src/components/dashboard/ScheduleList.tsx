@@ -3,6 +3,7 @@ import Schedule from "./Schedule";
 import type { ScheduleWithHistory } from "../../types/scheduleTypes";
 import EditSchedulePopup from "./EditSchedulePopup";
 import BaseButton from "../BaseButton";
+import { formatTimestamp } from "../../lib/formatTimestamp";
 
 export default function ScheduleList() {
   const [schedules, setSchedules] = React.useState<ScheduleWithHistory[]>([
@@ -35,6 +36,7 @@ export default function ScheduleList() {
     repository: string;
   } | null>(null);
   const [showBackupNow, setShowBackupNow] = React.useState("");
+  const [showDelete, setShowDelete] = React.useState<number | null>(null);
 
   function loadSchedules() {
     fetch("/api/schedules", {
@@ -97,6 +99,27 @@ export default function ScheduleList() {
       });
   }
 
+  function handleDeleteClick(id: number) {
+    fetch(`/api/schedules/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          console.error("Failed to delete schedule");
+        }
+
+        setShowDelete(null);
+        loadSchedules();
+      })
+      .catch((error) => {
+        setShowDelete(null);
+        console.error(error);
+      });
+  }
+
   React.useEffect(() => {
     loadSchedules();
     document.addEventListener("reloadSchedules", loadSchedules);
@@ -136,7 +159,11 @@ export default function ScheduleList() {
             name={schedule.name}
             link={schedule.repository}
             paused={schedule.paused}
-            lastBackup={schedule.backupHistory[0]?.timestamp || "Never"}
+            lastBackup={
+              (schedule.backupHistory[0]?.timestamp &&
+                formatTimestamp(schedule.backupHistory[0]?.timestamp)) ||
+              "Never"
+            }
             last={schedules.length - 1 === index}
             editClick={() =>
               setEditMenuDetails({
@@ -148,6 +175,7 @@ export default function ScheduleList() {
             }
             backupNowClick={() => backupNow(schedule.id)}
             pauseClick={() => handlePauseClick(schedule.id, schedule.paused)}
+            deleteClick={() => setShowDelete(schedule.id)}
           />
         ))
       )}
@@ -172,6 +200,35 @@ export default function ScheduleList() {
             <div className="p-4">
               <BaseButton onClick={() => setShowBackupNow("")} fullWidth>
                 Close
+              </BaseButton>
+            </div>
+          </div>
+        </div>
+      )}
+      {showDelete && (
+        <div className="p-4 fixed w-full h-full top-0 left-0 bg-black bg-opacity-50 grid place-content-center z-50">
+          <div
+            className={`rounded-lg bg-black border border-border-200 md:w-96`}
+          >
+            <h2 className="text-2xl font-medium p-4">Delete schedule</h2>
+            <div className="bg-bg-200 p-4 border-y border-border-200">
+              <p className="text-secondary">
+                Are you sure you want to delete this schedule?
+              </p>
+            </div>
+            <div className="p-4 flex items-center gap-4">
+              <BaseButton
+                type="secondary"
+                onClick={() => setShowDelete(null)}
+                fullWidth
+              >
+                Cancel
+              </BaseButton>
+              <BaseButton
+                onClick={() => handleDeleteClick(showDelete)}
+                fullWidth
+              >
+                Delete
               </BaseButton>
             </div>
           </div>

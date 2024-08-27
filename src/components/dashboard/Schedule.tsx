@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from "react";
-import { formatTimestamp } from "../../lib/formatTimestamp";
 import MenuIcon from "../icons/MenuIcon";
 import TimeIcon from "../icons/TimeIcon";
 
@@ -69,7 +68,10 @@ export default function Schedule(props: Props) {
             >
               {props.paused ? "Resume" : "Pause"}
             </button>
-            <button className="text-left rounded-lg text-red hover:bg-bg-100 transition-colors p-2 px-4 w-full whitespace-nowrap">
+            <button
+              onClick={props.deleteClick}
+              className="text-left rounded-lg text-red hover:bg-bg-100 transition-colors p-2 px-4 w-full whitespace-nowrap"
+            >
               Delete
             </button>
           </div>
@@ -78,7 +80,7 @@ export default function Schedule(props: Props) {
       <div className="flex items-center gap-2 px-4 pb-4">
         <TimeIcon />
         <span className="text-secondary text-sm">
-          Last backup: {formatTimestamp(props.lastBackup)}
+          Last backup: {props.lastBackup}
         </span>
       </div>
     </div>

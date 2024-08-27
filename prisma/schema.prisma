@@ -13,7 +13,7 @@ datasource db {
 model user {
   username String @id
   password String
-  backupJobs backupJob[]
+  backupJobs backupJob[] 
 }
 
 model backupJob {
@@ -29,8 +29,8 @@ model backupJob {
 
 model backupHistory {
   id Int @id @default(autoincrement())
-  backupJob backupJob @relation(fields: [backupJobId], references: [id])
-  backupJobId Int
+  backupJob backupJob? @relation(fields: [backupJobId], references: [id], onDelete: SetNull)
+  backupJobId Int?
   timestamp DateTime @default(now())
   success Boolean
   message String?
