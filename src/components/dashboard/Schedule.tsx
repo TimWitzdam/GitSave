@@ -6,6 +6,7 @@ import TimeIcon from "../icons/TimeIcon";
 type Props = {
   name: string;
   link: string;
+  paused: boolean;
   lastBackup: string;
   last?: boolean;
   editClick: () => void;
@@ -35,7 +36,9 @@ export default function Schedule(props: Props) {
     <div className={`${props.last ? "" : "border-b border-border-200"}`}>
       <div className="flex justify-between items-start mb-3">
         <div className="flex gap-3 px-4 pt-4">
-          <div className="rounded-full bg-green w-4 h-4 shrink-0"></div>
+          <div
+            className={`${props.paused ? "bg-orange" : "bg-green"} rounded-full w-4 h-4 shrink-0`}
+          ></div>
           <div>
             <p className="leading-none mb-1">{props.name}</p>
             <span className="text-secondary text-sm">{props.link}</span>
@@ -60,8 +63,11 @@ export default function Schedule(props: Props) {
             >
               Backup now
             </button>
-            <button className="text-left rounded-lg text-orange hover:bg-bg-100 transition-colors p-2 px-4 w-full whitespace-nowrap">
-              Pause
+            <button
+              onClick={props.pauseClick}
+              className={`${props.paused ? "text-green" : "text-orange"} text-left rounded-lg hover:bg-bg-100 transition-colors p-2 px-4 w-full whitespace-nowrap`}
+            >
+              {props.paused ? "Resume" : "Pause"}
             </button>
             <button className="text-left rounded-lg text-red hover:bg-bg-100 transition-colors p-2 px-4 w-full whitespace-nowrap">
               Delete

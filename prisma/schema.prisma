@@ -21,6 +21,7 @@ model backupJob {
   name String
   repository String
   cron String
+  paused Boolean @default(false)
   user user @relation(fields: [username], references: [username])
   username String
   backupHistory backupHistory[]

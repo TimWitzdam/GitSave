@@ -274,6 +274,46 @@ app.post("/api/schedules/:id/backup", authenticateJWT, (req, res) => {
     });
 });
 
+app.put("/api/schedules/:id/pause", authenticateJWT, (req, res) => {
+  const { id } = req.params;
+
+  prisma.backupJob
+    .update({
+      where: {
+        id: parseInt(id),
+      },
+      data: {
+        paused: true,
+      },
+    })
+    .then((schedule) => {
+      return res.json(schedule);
+    })
+    .catch((error) => {
+      return res.status(500).send("Internal server error");
+    });
+});
+
+app.put("/api/schedules/:id/resume", authenticateJWT, (req, res) => {
+  const { id } = req.params;
+
+  prisma.backupJob
+    .update({
+      where: {
+        id: parseInt(id),
+      },
+      data: {
+        paused: false,
+      },
+    })
+    .then((schedule) => {
+      return res.json(schedule);
+    })
+    .catch((error) => {
+      return res.status(500).send("Internal server error");
+    });
+});
+
 app.get("/api/history", authenticateJWT, (req, res) => {
   const { limit, offset } = req.query;
 

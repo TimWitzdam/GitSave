@@ -11,6 +11,7 @@ export default function ScheduleList() {
       name: "a",
       repository: "https://github.com/TimWitzdam/cryptodisplay-website",
       cron: "4 */1 * * *",
+      paused: true,
       username: "a",
       backupHistory: [
         {
@@ -77,6 +78,25 @@ export default function ScheduleList() {
       });
   }
 
+  function handlePauseClick(id: number, paused: boolean) {
+    fetch(`/api/schedules/${id}/${paused ? "resume" : "pause"}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          console.error("Failed to pause/resume schedule");
+        }
+
+        loadSchedules();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
   React.useEffect(() => {
     loadSchedules();
     document.addEventListener("reloadSchedules", loadSchedules);
@@ -115,6 +135,7 @@ export default function ScheduleList() {
             key={schedule.id}
             name={schedule.name}
             link={schedule.repository}
+            paused={schedule.paused}
             lastBackup={schedule.backupHistory[0]?.timestamp || "Never"}
             last={schedules.length - 1 === index}
             editClick={() =>
@@ -126,6 +147,7 @@ export default function ScheduleList() {
               })
             }
             backupNowClick={() => backupNow(schedule.id)}
+            pauseClick={() => handlePauseClick(schedule.id, schedule.paused)}
           />
         ))
       )}

@@ -3,6 +3,7 @@ export type Schedule = {
   name: string;
   repository: string;
   cron: string;
+  paused: boolean;
   username: string;
 };
 
