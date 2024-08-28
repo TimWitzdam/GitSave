@@ -10,6 +10,7 @@ import { authenticateJWT } from "./src/middleware/authenticateJWT.js";
 const app = express();
 const PORT = 3000;
 const JWT_SECRET = process.env.JWT_SECRET;
+let cronJobs = [];
 app.use(express.json());
 
 function createCronExpression(every, timespan) {
@@ -142,6 +143,7 @@ app.post("/api/schedules", authenticateJWT, (req, res) => {
           },
         })
         .then((schedule) => {
+          scheduleCronJobs();
           return res.json(schedule);
         })
         .catch((error) => {
@@ -225,6 +227,7 @@ app.put("/api/schedules/:id", authenticateJWT, (req, res) => {
           },
         })
         .then((schedule) => {
+          scheduleCronJobs();
           return res.json(schedule);
         })
         .catch((error) => {
@@ -287,6 +290,7 @@ app.put("/api/schedules/:id/pause", authenticateJWT, (req, res) => {
       },
     })
     .then((schedule) => {
+      stopCronJob(parseInt(id));
       return res.json(schedule);
     })
     .catch((error) => {
@@ -307,6 +311,7 @@ app.put("/api/schedules/:id/resume", authenticateJWT, (req, res) => {
       },
     })
     .then((schedule) => {
+      resumeCronJob(parseInt(id));
       return res.json(schedule);
     })
     .catch((error) => {
@@ -324,6 +329,7 @@ app.delete("/api/schedules/:id", authenticateJWT, (req, res) => {
       },
     })
     .then(() => {
+      stopCronJob(parseInt(id), true);
       return res.send("Schedule deleted");
     })
     .catch((error) => {
@@ -464,23 +470,46 @@ function createBackup(id, name, repository) {
   });
 }
 
-prisma.backupJob
-  .findMany()
-  .then((backupJobs) => {
-    console.log(
-      `Scheduling ${backupJobs.length} backup job${backupJobs.length === 0 || (backupJobs.length > 1 ? "s" : "")}`
-    );
-    for (const job of backupJobs) {
-      cron.schedule(job.cron, () => {
-        console.log(`Creating backup of ${job.name}`);
-        createBackup(job.id, job.name, job.repository);
-        console.log("Finished backup");
-      });
-    }
-  })
-  .catch((error) => {
-    console.log(error);
-  });
+function scheduleCronJobs() {
+  for (const job of cronJobs) {
+    job.job.stop();
+  }
+  cronJobs = [];
+
+  prisma.backupJob
+    .findMany()
+    .then((backupJobs) => {
+      console.log(
+        `Scheduling ${backupJobs.length} backup job${backupJobs.length === 0 || (backupJobs.length > 1 ? "s" : "")}`
+      );
+      for (const job of backupJobs) {
+        const c = cron.schedule(job.cron, () => {
+          console.log(`Creating backup of ${job.name}`);
+          createBackup(job.id, job.name, job.repository);
+          console.log("Finished backup");
+        });
+        cronJobs.push({ id: job.id, job: c });
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
+function stopCronJob(id, deleteJob = false) {
+  const job = cronJobs.find((j) => j.id === id);
+  if (job) {
+    job.job.stop();
+    if (deleteJob) cronJobs = cronJobs.filter((j) => j.id !== id);
+  }
+}
+
+function resumeCronJob(id) {
+  const job = cronJobs.find((j) => j.id === id);
+  if (job) {
+    job.job.start();
+  }
+}
 
 app.use(
   "/dashboard",
@@ -494,6 +523,7 @@ app.use(
 );
 app.use(express.static("dist"));
 
+scheduleCronJobs();
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });

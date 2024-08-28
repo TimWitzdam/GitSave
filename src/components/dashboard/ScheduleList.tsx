@@ -6,28 +6,7 @@ import BaseButton from "../BaseButton";
 import { formatTimestamp } from "../../lib/formatTimestamp";
 
 export default function ScheduleList() {
-  const [schedules, setSchedules] = React.useState<ScheduleWithHistory[]>([
-    {
-      id: 1,
-      name: "a",
-      repository: "https://github.com/TimWitzdam/cryptodisplay-website",
-      cron: "4 */1 * * *",
-      paused: true,
-      username: "a",
-      backupHistory: [
-        {
-          id: 81,
-          backupJobId: 1,
-          backupJob: {
-            name: "asd",
-          },
-          timestamp: "2024-08-26T13:15:01.409Z",
-          success: true,
-          message: null,
-        },
-      ],
-    },
-  ]);
+  const [schedules, setSchedules] = React.useState<ScheduleWithHistory[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [editMenuDetails, setEditMenuDetails] = React.useState<{
     id: number;
