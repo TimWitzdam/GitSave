@@ -480,7 +480,7 @@ function scheduleCronJobs() {
     .findMany()
     .then((backupJobs) => {
       console.log(
-        `Scheduling ${backupJobs.length} backup job${backupJobs.length === 0 || (backupJobs.length > 1 ? "s" : "")}`
+        `Scheduling ${backupJobs.length} backup job${backupJobs.length === 0 || backupJobs.length > 1 ? "s" : ""}`
       );
       for (const job of backupJobs) {
         const c = cron.schedule(job.cron, () => {

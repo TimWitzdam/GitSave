@@ -74,6 +74,12 @@ export default function HistoryList({ disablePaging = false }: Props) {
             ))}
           </div>
         </div>
+      ) : history.length === 0 ? (
+        <div className={`rounded-lg bg-bg-300 border border-border-200`}>
+          <div className="p-4">
+            <p className="text-secondary">No history found</p>
+          </div>
+        </div>
       ) : (
         <div
           className={`rounded-lg bg-bg-300 border border-border-200 ${!disablePaging && "mb-4"}`}

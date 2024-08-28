@@ -7,7 +7,7 @@ import { formatTimestamp } from "../../lib/formatTimestamp";
 
 export default function ScheduleList() {
   const [schedules, setSchedules] = React.useState<ScheduleWithHistory[]>([]);
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
   const [editMenuDetails, setEditMenuDetails] = React.useState<{
     id: number;
     name: string;
@@ -130,6 +130,13 @@ export default function ScheduleList() {
               </div>
             ))}
           </div>
+        </div>
+      ) : schedules.length === 0 ? (
+        <div className="p-4">
+          <p className="text-secondary">
+            You don't have any schedules yet. Create one by clicking the button
+            on the top right.
+          </p>
         </div>
       ) : (
         schedules.map((schedule, index) => (

@@ -9,7 +9,7 @@ export default function PhoneNavMenu(props: Props) {
   return (
     <div
       id="phone-nav-menu"
-      className="opacity-0 pointer-events-none bg-bg-400 fixed top-0 left-0 w-full h-full transition-opacity duration-300"
+      className="opacity-0 pointer-events-none bg-bg-400 fixed top-0 left-0 w-full h-full transition-opacity duration-300 z-50"
     >
       <div className="p-4 flex items-start justify-between md:mb-4">
         <div className="rounded-lg p-2 flex items-center justify-center gap-4 border border-border-100 mb-4 w-12 h-12">
