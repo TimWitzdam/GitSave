@@ -1,10 +1,10 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import LoginForm from "../components/login/LoginForm";
 import GitIcon from "../components/icons/GitIcon";
+import Setup from "../components/Setup";
 ---
 
-<title>Login | GitSave</title>
+<title>Setup | GitSave</title>
 <Layout>
   <div class="flex items-center justify-center h-screen px-4">
     <div>
@@ -14,8 +14,7 @@ import GitIcon from "../components/icons/GitIcon";
         <GitIcon />
         <span class="text-2xl">GitSave</span>
       </div>
-      <h1 class="text-center font-medium text-2xl mb-6">Sign in</h1>
-      <LoginForm client:load />
+      <Setup client:load />
     </div>
   </div>
 </Layout>

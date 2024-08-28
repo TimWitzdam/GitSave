@@ -34,7 +34,7 @@ export default function LoginForm() {
       })
       .then((data) => {
         if (!data) return;
-        document.cookie = `auth_session=${data.token}; max-age=604800; path=/`;
+        document.cookie = `auth_session=${data.token}; max-age=604800; path=/: SameSite=Strict`;
         setSuccess("Logged in successfully. Redirecting...");
         setTimeout(() => {
           window.location.href = "/dashboard";

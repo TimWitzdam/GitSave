@@ -72,7 +72,7 @@ export default function AddSchedulePopup() {
             <BaseInput
               type="url"
               label="Repository link"
-              placeholder="https://github.com/exampleuser/examperepo.git"
+              placeholder="https://github.com/exampleuser/examplerepo.git"
               name="repository"
               required
             />

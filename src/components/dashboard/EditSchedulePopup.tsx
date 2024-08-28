@@ -105,7 +105,7 @@ export default function EditSchedulePopup(props: Props) {
             <BaseInput
               type="url"
               label="Repository link"
-              placeholder="https://github.com/exampleuser/examperepo.git"
+              placeholder="https://github.com/exampleuser/examplerepo.git"
               name="repository"
               value={repository}
               onChange={(e) => setRepository(e.target.value)}

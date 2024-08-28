@@ -6,6 +6,7 @@ import { execFile } from "child_process";
 import cron from "node-cron";
 import fs from "fs";
 import { authenticateJWT } from "./src/middleware/authenticateJWT.js";
+import { userExistCheck } from "./src/middleware/userExistCheck.js";
 
 const app = express();
 const PORT = 3000;
@@ -63,6 +64,39 @@ app.post("/api/login", (req, res) => {
     });
 });
 
+app.post("/api/register", userExistCheck, (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+
+  if (!username || !password) {
+    return res.status(400).send("Username and password are required");
+  }
+
+  bcrypt.hash(password, 10, (err, hash) => {
+    if (err) {
+      return res.status(500).send("Internal server error");
+    }
+
+    const jwtToken = jwt.sign({ username: username }, JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    prisma.user
+      .create({
+        data: {
+          username: username,
+          password: hash,
+        },
+      })
+      .then((user) => {
+        res.json({ token: jwtToken });
+      })
+      .catch((error) => {
+        return res.status(500).send("Internal server error");
+      });
+  });
+});
+
 app.get("/api/schedules", authenticateJWT, (req, res) => {
   prisma.backupJob
     .findMany({
@@ -109,7 +143,6 @@ app.post("/api/schedules", authenticateJWT, (req, res) => {
   }
 
   let url;
-
   try {
     url = new URL(schedule.repository);
   } catch (error) {
@@ -158,12 +191,8 @@ app.post("/api/schedules", authenticateJWT, (req, res) => {
 
   child.on("exit", (code) => {
     clearTimeout(timeout);
-    if (code !== 0) {
-      return res
-        .status(400)
-        .send(
-          "Invalid repository. Either it does not exist or you do not have access to it."
-        );
+    if (code === null) {
+      return res.status(400).send("The process took too long and was aborted.");
     }
   });
 });
@@ -521,6 +550,7 @@ app.use(
   (req, res, next) => authenticateJWT(req, res, next, true),
   express.static("dist/login")
 );
+app.use("/setup", userExistCheck, express.static("dist/setup"));
 app.use(express.static("dist"));
 
 scheduleCronJobs();
