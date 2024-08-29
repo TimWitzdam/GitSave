@@ -21,6 +21,13 @@ const links = [
   const closeButton = document.querySelector(
     "#close-phone-nav-menu"
   ) as HTMLButtonElement;
+  const userMenuButton = document.querySelector(
+    "#user-menu-button"
+  ) as HTMLButtonElement;
+  const userMenu = document.querySelector("#user-menu") as HTMLElement;
+  const logoutButton = document.querySelector(
+    "#logout-button"
+  ) as HTMLButtonElement;
 
   function togglePhoneMenu() {
     phoneMenu.classList.toggle("opacity-0");
@@ -38,6 +45,16 @@ const links = [
       link.classList.add("border-border-100", "text-white", "bg-border-200");
     }
   });
+
+  userMenuButton.addEventListener("click", () => {
+    userMenu.classList.toggle("hidden");
+  });
+
+  logoutButton.addEventListener("click", () => {
+    document.cookie =
+      "auth_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    window.location.href = "/login";
+  });
 </script>
 
 <Layout>
@@ -50,11 +67,25 @@ const links = [
         <span class="text-2xl hidden md:inline">GitSave</span>
       </div>
       <div class="flex items-center gap-4">
-        <button
-          class="rounded-full border border-border-100 flex items-center justify-center w-12 h-12"
-        >
-          <UserIcon />
-        </button>
+        <div class="relative">
+          <button
+            id="user-menu-button"
+            class="rounded-full border border-border-100 flex items-center justify-center w-12 h-12"
+          >
+            <UserIcon />
+          </button>
+          <div
+            id="user-menu"
+            class="hidden absolute right-0 mt-2 z-10 border border-border-200 p-2 rounded-lg bg-bg-300 text-secondary"
+          >
+            <button
+              id="logout-button"
+              class="text-left rounded-lg hover:bg-bg-100 transition-colors p-2 px-4 w-full whitespace-nowrap"
+            >
+              Log out
+            </button>
+          </div>
+        </div>
         <button
           id="burger-menu"
           class="rounded-full border border-border-100 flex items-center justify-center md:hidden w-12 h-12"
