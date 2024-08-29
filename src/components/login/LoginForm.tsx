@@ -34,7 +34,7 @@ export default function LoginForm() {
       })
       .then((data) => {
         if (!data) return;
-        document.cookie = `auth_session=${data.token}; max-age=604800; path=/: SameSite=Strict`;
+        document.cookie = `auth_session=${data.token}; max-age=604800; path=/; SameSite=Strict`;
         setSuccess("Logged in successfully. Redirecting...");
         setTimeout(() => {
           window.location.href = "/dashboard";
@@ -52,12 +52,22 @@ export default function LoginForm() {
         id="login"
         className="flex flex-col gap-4"
       >
-        <BaseInput type="text" name="username" placeholder="Username" />
-        <BaseInput type="password" name="password" placeholder="Password" />
+        <BaseInput
+          type="text"
+          name="username"
+          placeholder="Username"
+          required
+        />
+        <BaseInput
+          type="password"
+          name="password"
+          placeholder="Password"
+          required
+        />
         <a className="text-secondary opacity-60 hover:opacity-100 transition-opacity">
           Forgot password?
         </a>
-        <BaseButton>Sign in</BaseButton>
+        <BaseButton buttonType="submit">Sign in</BaseButton>
       </form>
       {error && <p className="text-red text-center mt-4">{error}</p>}
       {success && <p className="text-green text-center mt-4">{success}</p>}

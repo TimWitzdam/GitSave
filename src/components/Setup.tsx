@@ -123,12 +123,23 @@ export default function Setup() {
             1. Account creation
           </h1>
           <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-4">
-            <BaseInput type="text" name="username" placeholder="Username" />
-            <BaseInput type="password" name="password" placeholder="Password" />
+            <BaseInput
+              type="text"
+              name="username"
+              placeholder="Username"
+              required
+            />
+            <BaseInput
+              type="password"
+              name="password"
+              placeholder="Password"
+              required
+            />
             <BaseInput
               type="password"
               name="confirmPassword"
               placeholder="Confirm password"
+              required
             />
             <BaseButton buttonType="submit">
               <div className="flex items-center justify-center gap-2">

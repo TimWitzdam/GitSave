@@ -1,7 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import GitIcon from "../components/icons/GitIcon";
-import Setup from "../components/Setup";
+import SetupComponent from "../components/Setup";
 ---
 
 <title>Setup | GitSave</title>
@@ -14,7 +14,7 @@ import Setup from "../components/Setup";
         <GitIcon />
         <span class="text-2xl">GitSave</span>
       </div>
-      <Setup client:load />
+      <SetupComponent client:load />
     </div>
   </div>
 </Layout>

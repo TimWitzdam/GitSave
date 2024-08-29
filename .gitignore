@@ -23,6 +23,7 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
+GitSave.db
 dev.db
 test.http
 backups
