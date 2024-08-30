@@ -11,6 +11,8 @@ RUN npm install --production=false
 
 FROM build-deps AS build
 COPY . .
+RUN npx prisma db push
+RUN npx prisma generate
 RUN npm run build
 
 FROM base AS runtime
@@ -20,6 +22,7 @@ COPY --from=build /app/dist ./dist
 COPY . .
 RUN mkdir -p /app/data
 RUN npx prisma db push
+RUN npx prisma generate
 RUN apk add --no-cache git
 
 EXPOSE 3000
