@@ -1,9 +1,12 @@
 ---
+import prisma from "../../prisma/client";
 
+const users = await prisma.user.findMany({});
+const userExists = users.length > 0;
 ---
 
-<script>
-  function getCookie(cookies: string, name: string) {
+<script is:inline define:vars={{ userExists }}>
+  function getCookie(cookies, name) {
     const value = `; ${cookies}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop()?.split(";").shift();
@@ -11,7 +14,9 @@
 
   const cookies = document.cookie;
 
-  if (getCookie(cookies, "auth_session")) {
+  if (!userExists) {
+    location.href = "/setup";
+  } else if (getCookie(cookies, "auth_session")) {
     location.href = "/dashboard";
   } else {
     location.href = "/login";
@@ -27,6 +32,6 @@
     <title>Astro</title>
   </head>
   <body>
-    <h1>Astro</h1>
+    <h1>If you're not redirected, click <a href="/setup">here</a></h1>
   </body>
 </html>
