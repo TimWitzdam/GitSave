@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="https://i.imgur.com/kiMG6EJ.png" alt="GitSave Logo" height="250" />
+    <img src="https://i.imgur.com/kiMG6EJ.png" alt="GitSave Logo" />
     <h1 align="center">GitSave</a></h1>
     <p align="center">Easily back up your Git repositories on a schedule.</p>
     <br />
