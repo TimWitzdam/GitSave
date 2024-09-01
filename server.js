@@ -518,6 +518,9 @@ function scheduleCronJobs() {
           console.log("Finished backup");
         });
         cronJobs.push({ id: job.id, job: c });
+        if (job.paused) {
+          c.stop();
+        }
       }
     })
     .catch((error) => {
