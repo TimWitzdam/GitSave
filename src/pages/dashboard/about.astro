@@ -5,6 +5,25 @@ import DashboardLayout from "../../layouts/DashboardLayout.astro";
 const applicationVersion = process.env.npm_package_version;
 ---
 
+<script define:vars={{ applicationVersion }}>
+  document.addEventListener("DOMContentLoaded", () => {
+    const update = document.getElementById("update");
+    const updateText = document.getElementById("update-text");
+
+    fetch("https://api.github.com/repos/TimWitzdam/gitsave/releases").then(
+      (response) => {
+        response.json().then((data) => {
+          const latestVersion = data[0].tag_name;
+          if (latestVersion !== applicationVersion) {
+            update.classList.remove("hidden");
+            updateText.innerText = `Update to ${latestVersion} avaliable`;
+          }
+        });
+      }
+    );
+  });
+</script>
+
 <title>About | GitSave</title>
 <DashboardLayout>
   <div slot="header" class="flex items-center justify-between">
@@ -13,7 +32,7 @@ const applicationVersion = process.env.npm_package_version;
   <div class="p-4 max-w-7xl mx-auto">
     <div class="grid place-content-center">
       <div
-        class="rounded-lg p-4 flex flex-col items-center justify-center gap-4 border border-border-100 mb-2"
+        class="rounded-lg p-4 flex flex-col items-center justify-center gap-4 border border-border-100 mb-2 w-fit mx-auto"
       >
         <div>
           <GitIcon />
@@ -27,6 +46,17 @@ const applicationVersion = process.env.npm_package_version;
           target="_blank"
           class="hover:text-white hover:underline transition-colors">GitHub</a
         >
+        <div id="update" class="hidden">
+          <div class="flex items-center justify-center gap-2 mt-10">
+            <div class="bg-green rounded-full w-4 h-4 shrink-0"></div>
+            <span id="update-text">Update to V1.1 avaliable</span>
+          </div>
+          <a
+            class="underline hover:text-white transition-colors"
+            href="https://github.com/TimWitzdam/GitSave/wiki/How-to-update"
+            >Click here for update instructions</a
+          >
+        </div>
       </div>
     </div>
   </div>
