@@ -128,7 +128,9 @@ app.post("/api/schedules", authenticateJWT, (req, res) => {
     !schedule.name ||
     !schedule.repository ||
     !schedule.every ||
-    !schedule.timespan
+    !schedule.timespan ||
+    schedule.private === undefined ||
+    schedule.accessTokenId === undefined
   ) {
     return res.status(400).send("Missing required fields");
   }
@@ -142,59 +144,89 @@ app.post("/api/schedules", authenticateJWT, (req, res) => {
     return res.status(400).send("Invalid schedule");
   }
 
-  let url;
+  let repoUrl;
   try {
-    url = new URL(schedule.repository);
+    repoUrl = new URL(schedule.repository);
   } catch (error) {
     return res.status(400).send("Invalid repository URL");
   }
 
-  const child = execFile(
-    "git",
-    ["ls-remote", url.href],
-    (error, stdout, stderr) => {
-      if (error) {
-        if (error.killed) {
-          return res
-            .status(500)
-            .send("The process took too long and was aborted.");
+  const initialUrl = repoUrl.href;
+  if (schedule.private) {
+    prisma.accessToken
+      .findUnique({
+        where: { id: parseInt(schedule.accessTokenId) },
+        select: { token: true },
+      })
+      .then((accessToken) => {
+        if (!accessToken) {
+          return res.status(400).send("Access token not found");
         }
+
+        repoUrl.href = repoUrl.href.replace(
+          "https://",
+          `https://${accessToken.token}@`
+        );
+
+        proceedWithScheduleCreation();
+      })
+      .catch((error) => {
+        return res.status(500).send("Error fetching access token");
+      });
+  } else {
+    proceedWithScheduleCreation();
+  }
+
+  function proceedWithScheduleCreation() {
+    const child = execFile(
+      "git",
+      ["ls-remote", repoUrl.href],
+      (error, stdout, stderr) => {
+        if (error) {
+          return res
+            .status(400)
+            .send(
+              "Invalid repository. Either it does not exist or you forgot to select an access token."
+            );
+        }
+
+        prisma.backupJob
+          .create({
+            data: {
+              name: schedule.name,
+              repository: initialUrl,
+              cron: createCronExpression(schedule.every, schedule.timespan),
+              username: req.user.username,
+              accessTokenId:
+                schedule.private === "on"
+                  ? parseInt(schedule.accessTokenId)
+                  : null,
+            },
+          })
+          .then((newSchedule) => {
+            scheduleCronJobs();
+            return res.json(newSchedule);
+          })
+          .catch((error) => {
+            console.log(error);
+            return res.status(500).send("Internal server error");
+          });
+      }
+    );
+
+    const timeout = setTimeout(() => {
+      child.kill();
+    }, 5000);
+
+    child.on("exit", (code) => {
+      clearTimeout(timeout);
+      if (code === null) {
         return res
           .status(400)
-          .send(
-            "Invalid repository. Either it does not exist or you do not have access to it."
-          );
+          .send("The process took too long and was aborted.");
       }
-
-      prisma.backupJob
-        .create({
-          data: {
-            name: schedule.name,
-            repository: schedule.repository,
-            cron: createCronExpression(schedule.every, schedule.timespan),
-            username: req.user.username,
-          },
-        })
-        .then((schedule) => {
-          scheduleCronJobs();
-          return res.json(schedule);
-        })
-        .catch((error) => {
-          return res.status(500).send("Internal server error");
-        });
-    }
-  );
-
-  const timeout = setTimeout(() => {
-    child.kill();
-  }, 5000);
-
-  child.on("exit", (code) => {
-    clearTimeout(timeout);
-    if (code === null) {
-      return res.status(400).send("The process took too long and was aborted.");
-    }
-  });
+    });
+  }
 });
 
 app.put("/api/schedules/:id", authenticateJWT, (req, res) => {
@@ -425,6 +457,50 @@ app.get("/api/history", authenticateJWT, (req, res) => {
     });
 });
 
+app.post("/api/access-tokens", authenticateJWT, (req, res) => {
+  const { name, token } = req.body;
+
+  if (!name) {
+    return res.status(400).send("Name is required");
+  }
+
+  prisma.accessToken
+    .create({
+      data: {
+        name: name,
+        token: token,
+        username: req.user.username,
+      },
+    })
+    .then((accessToken) => {
+      return res.json(accessToken);
+    })
+    .catch((error) => {
+      console.log(error);
+      return res.status(500).send("Internal server error");
+    });
+});
+
+app.get("/api/access-tokens", authenticateJWT, (req, res) => {
+  prisma.accessToken
+    .findMany({
+      where: {
+        username: req.user.username,
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    })
+    .then((accessTokens) => {
+      return res.json(accessTokens);
+    })
+    .catch((error) => {
+      console.log(error);
+      return res.status(500).send("Internal server error");
+    });
+});
+
 function createHistoryEntry(data) {
   prisma.backupHistory
     .create({
@@ -512,20 +588,56 @@ function scheduleCronJobs() {
         `Scheduling ${backupJobs.length} backup job${backupJobs.length === 0 || backupJobs.length > 1 ? "s" : ""}`
       );
       for (const job of backupJobs) {
-        const c = cron.schedule(job.cron, () => {
-          console.log(`Creating backup of ${job.name}`);
-          createBackup(job.id, job.name, job.repository);
-          console.log("Finished backup");
-        });
-        cronJobs.push({ id: job.id, job: c });
-        if (job.paused) {
-          c.stop();
+        if (job.accessTokenId) {
+          prisma.accessToken
+            .findUnique({
+              where: {
+                id: job.accessTokenId,
+              },
+              select: {
+                token: true,
+              },
+            })
+            .then((accessToken) => {
+              if (!accessToken) {
+                console.log("Access token not found");
+              } else {
+                const repoWithToken = job.repository.replace(
+                  "https://",
+                  `https://${accessToken.token}@`
+                );
+                pushCronJob(
+                  job.cron,
+                  job.id,
+                  job.name,
+                  repoWithToken,
+                  job.paused
+                );
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        } else {
+          pushCronJob(job.cron, job.id, job.name, job.repository, job.paused);
         }
       }
     })
     .catch((error) => {
       console.log(error);
     });
+
+  function pushCronJob(cronString, id, name, repository, paused) {
+    const c = cron.schedule(cronString, () => {
+      console.log(`Creating backup of ${name}`);
+      createBackup(id, name, repository);
+      console.log("Finished backup");
+    });
+    cronJobs.push({ id: id, job: c });
+    if (paused) {
+      c.stop();
+    }
+  }
 }
 
 function stopCronJob(id, deleteJob = false) {

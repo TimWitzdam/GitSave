@@ -14,6 +14,7 @@ model user {
   username String @id
   password String
   backupJobs backupJob[] 
+  accessTokens accessToken[]
 }
 
 model backupJob {
@@ -25,6 +26,8 @@ model backupJob {
   user user @relation(fields: [username], references: [username])
   username String
   backupHistory backupHistory[]
+  accessToken accessToken? @relation(fields: [accessTokenId], references: [id])
+  accessTokenId Int?
 }
 
 model backupHistory {
@@ -34,4 +37,13 @@ model backupHistory {
   timestamp DateTime @default(now())
   success Boolean
   message String?
+}
+
+model accessToken {
+  id Int @id @default(autoincrement())
+  token String
+  name String
+  user user @relation(fields: [username], references: [username])
+  username String
+  backupJobs backupJob[]
 }

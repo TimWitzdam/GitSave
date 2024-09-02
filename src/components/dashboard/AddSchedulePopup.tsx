@@ -7,6 +7,12 @@ export default function AddSchedulePopup() {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState(false);
+  const [showAddAccessToken, setShowAddAccessToken] = React.useState(false);
+  const [privateRepo, setPrivateRepo] = React.useState(false);
+  const [accessToken, setAccessToken] = React.useState("default");
+  const [availableAccessTokens, setAvailableAccessTokens] = React.useState<
+    { id: number; name: string }[]
+  >([]);
 
   function updateEvery(e: React.ChangeEvent<HTMLInputElement>) {
     if (parseInt(e.target.value) < 1) {
@@ -17,15 +23,26 @@ export default function AddSchedulePopup() {
     setEvery(parseInt(e.target.value));
   }
 
+  function updateAccessToken(e: React.ChangeEvent<HTMLSelectElement>) {
+    if (e.target.value === "new") {
+      setShowAddAccessToken(true);
+      return;
+    }
+    setAccessToken(e.target.value);
+  }
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
 
-    const formData = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
     const name = formData.get("name") as string;
     const repository = formData.get("repository") as string;
     const every = parseInt(formData.get("every") as string);
     const timespan = formData.get("timespan") as string;
+    const privateRepo = formData.get("private") as string;
+    const accessTokenId = formData.get("access-token") as string;
 
     setLoading(true);
     fetch("/api/schedules", {
@@ -33,10 +50,18 @@ export default function AddSchedulePopup() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name, repository, every, timespan }),
+      body: JSON.stringify({
+        name,
+        repository,
+        every,
+        timespan,
+        private: privateRepo,
+        accessTokenId,
+      }),
     })
       .then((res) => {
         if (res.ok) {
+          form.reset();
           return res.json();
         } else {
           res.text().then((errorMessage) => setError(errorMessage));
@@ -49,6 +74,36 @@ export default function AddSchedulePopup() {
       });
   }
 
+  function handleAccessTokenSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const name = formData.get("access-token-name") as string;
+    const token = formData.get("access-token") as string;
+
+    fetch("/api/access-tokens", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name, token }),
+    }).then(() => {
+      form.reset();
+      setShowAddAccessToken(false);
+      fetchAccessTokens();
+    });
+  }
+
+  function fetchAccessTokens() {
+    fetch("/api/access-tokens")
+      .then((res) => res.json())
+      .then((data) => setAvailableAccessTokens(data));
+  }
+
+  React.useEffect(() => {
+    fetchAccessTokens();
+  }, []);
+
   return (
     <div
       id="add-schedule"
@@ -57,7 +112,7 @@ export default function AddSchedulePopup() {
       <form
         onSubmit={handleSubmit}
         action="submit"
-        className={`${success && "hidden"} rounded-lg bg-black border border-border-200 md:w-96`}
+        className={`${(success || showAddAccessToken) && "hidden"} rounded-lg bg-black border border-border-200 md:w-96`}
       >
         <h2 className="text-2xl font-medium p-4">Add schedule</h2>
         <div className="bg-bg-200 p-4 border-y border-border-200">
@@ -69,13 +124,48 @@ export default function AddSchedulePopup() {
               name="name"
               required
             />
-            <BaseInput
-              type="url"
-              label="Repository link"
-              placeholder="https://github.com/exampleuser/examplerepo.git"
-              name="repository"
-              required
-            />
+            <div>
+              <span className="text-secondary">Repository</span>
+              <div className="mt-2">
+                <BaseInput
+                  type="url"
+                  placeholder="https://github.com/exampleuser/examplerepo.git"
+                  name="repository"
+                  required
+                />
+                <div className="flex items-center gap-2 mt-2">
+                  <div className="flex items-center gap-2 rounded-lg bg-bg-300 border-2 border-border-200 text-center py-3 px-4 text-secondary">
+                    <label htmlFor="private">Private?</label>
+                    <input
+                      type="checkbox"
+                      name="private"
+                      id="private"
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setPrivateRepo(e.target.checked)
+                      }
+                    />
+                  </div>
+                  {privateRepo && (
+                    <select
+                      name="access-token"
+                      onChange={updateAccessToken}
+                      value={accessToken}
+                      className="outline-none w-full rounded-lg bg-bg-300 border-2 border-border-200 py-3 px-4 text-secondary focus:border-border-100 transition-colors"
+                    >
+                      <option disabled value="default">
+                        Select an option
+                      </option>
+                      {availableAccessTokens.map((token) => (
+                        <option key={token.id} value={token.id}>
+                          {token.name}
+                        </option>
+                      ))}
+                      <option value="new">+ Add new access token</option>
+                    </select>
+                  )}
+                </div>
+              </div>
+            </div>
             <div>
               <label className="text-secondary">Backup routine</label>
               <div className="flex flex-col gap-2 mt-2 sm:flex-row sm:items-center ">
@@ -146,6 +236,46 @@ export default function AddSchedulePopup() {
             Close
           </BaseButton>
         </div>
+      </div>
+      <div
+        className={`${!showAddAccessToken && "hidden"} rounded-lg bg-black border border-border-200`}
+      >
+        <h2 className="text-2xl font-medium p-4">Add access token</h2>
+        <form action="submit" onSubmit={handleAccessTokenSubmit}>
+          <div className="bg-bg-200 p-4 border-t border-border-200 flex flex-col gap-6">
+            <a
+              className="text-secondary underline hover:text-white transition-colors"
+              href="https://github.com/TimWitzdam/GitSave/wiki/How-to-create-a-GitHub-access-token"
+              target="_blank"
+            >
+              How to create a GitHub access token
+            </a>
+            <BaseInput
+              type="text"
+              label="Name"
+              placeholder="Enter access token name"
+              name="access-token-name"
+              required
+            />
+            <BaseInput
+              type="password"
+              label="Token"
+              placeholder="Enter access token"
+              name="access-token"
+              required
+            />
+          </div>
+          <div className="p-4 flex items-center justify-between">
+            <BaseButton
+              type="secondary"
+              buttonType="reset"
+              onClick={() => setShowAddAccessToken(false)}
+            >
+              Go back
+            </BaseButton>
+            <BaseButton buttonType="submit">Add access token</BaseButton>
+          </div>
+        </form>
       </div>
     </div>
   );
