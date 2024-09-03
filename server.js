@@ -178,11 +178,19 @@ app.post("/api/schedules", authenticateJWT, (req, res) => {
   }
 
   function proceedWithScheduleCreation() {
+    const options = {
+      env: {
+        ...process.env,
+        GIT_ASKPASS: "/bin/false",
+      },
+    };
     const child = execFile(
       "git",
       ["ls-remote", repoUrl.href],
+      options,
       (error, stdout, stderr) => {
         if (error) {
+          console.log(error);
           return res
             .status(400)
             .send(
@@ -518,16 +526,23 @@ function createHistoryEntry(data) {
 function createBackup(id, name, repository) {
   let backupJobData = {};
   const currentTimestamp = Math.floor(Date.now() / 1000);
+  const options = {
+    env: {
+      ...process.env,
+      GIT_ASKPASS: "/bin/false",
+    },
+  };
   const child = execFile(
     "git",
     ["clone", "--mirror", repository, `./backups/${id}/${currentTimestamp}`],
+    options,
     (error, stdout, stderr) => {
       if (error) {
         if (error.killed) {
           backupJobData = {
             backupJobId: id,
             success: false,
-            message: "Request took too long",
+            message: "Request took too long (has the access token expired?)",
           };
         } else {
           backupJobData = {
@@ -568,7 +583,7 @@ function createBackup(id, name, repository) {
       backupJobData = {
         backupJobId: id,
         success: false,
-        message: "Request took too long",
+        message: "Request took too long (has the access token expired?)",
       };
       createHistoryEntry(backupJobData);
     }
