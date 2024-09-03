@@ -7,6 +7,7 @@ import cron from "node-cron";
 import fs from "fs";
 import { authenticateJWT } from "./src/middleware/authenticateJWT.js";
 import { userExistCheck } from "./src/middleware/userExistCheck.js";
+import { sanitize } from "./src/lib/sanatize.js";
 
 const app = express();
 const PORT = 3000;
@@ -532,9 +533,10 @@ function createBackup(id, name, repository) {
       GIT_ASKPASS: "/bin/false",
     },
   };
+  const folderName = `./backups/${id} (${sanitize(name)})`;
   const child = execFile(
     "git",
-    ["clone", "--mirror", repository, `./backups/${id}/${currentTimestamp}`],
+    ["clone", "--mirror", repository, `${folderName}/${currentTimestamp}`],
     options,
     (error, stdout, stderr) => {
       if (error) {
@@ -556,11 +558,11 @@ function createBackup(id, name, repository) {
           backupJobId: id,
           success: true,
         };
-        fs.readdir(`./backups/${id}/`, (err, files) => {
+        fs.readdir(`${folderName}/`, (err, files) => {
           if (files.length >= 2) {
             const oldFiles = files.filter((f) => f != currentTimestamp);
             for (const oldFile of oldFiles) {
-              fs.rmSync(`./backups/${id}/${oldFile}`, {
+              fs.rmSync(`${folderName}/${oldFile}`, {
                 recursive: true,
                 force: true,
               });
