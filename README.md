@@ -25,7 +25,7 @@ So be prepared and keep backups of your own and favourite Git repositories.
 
 ### Single run command
 ```bash
-docker run -d --restart=always -p 3000:3000 -v gitsave:/app/data -v ./backups:/app/backups -e JWT_SECRET={YOUR_SECRET_HERE} --name GitSave timwitzdam/gitsave
+docker run -d --restart=always -p 3000:3000 -v gitsave:/app/data -v ./backups:/app/backups -e JWT_SECRET={YOUR_SECRET_HERE} --name GitSave timwitzdam/gitsave:1.1.0
 ```
 ### Docker compose
 1. Create .env file
@@ -37,7 +37,7 @@ JWT_SECRET="REPLACE_THIS"
 ```yaml
 services:
   gitsave:
-    image: timwitzdam/gitsave
+    image: timwitzdam/gitsave:1.1.0
     container_name: GitSave
     restart: always
     ports:
