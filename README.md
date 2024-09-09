@@ -6,7 +6,10 @@
 </div>
 
 ![GitSave 3 pages animation](https://i.imgur.com/i0SNNiL.gif)
-![GitSave in action preview](https://i.imgur.com/ZIcJgzv.gif)
+
+https://github.com/user-attachments/assets/301b28ca-6b72-490a-8efb-217e39fb73d3
+
+
 
 # Git happens...
 So be prepared and keep backups of your own and favourite Git repositories.
