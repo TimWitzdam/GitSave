@@ -24,4 +24,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: timwitzdam/gitsave:${{ steps.get-latest-tag.outputs.tag }}
+          tags: |
+            timwitzdam/gitsave:${{ steps.get-latest-tag.outputs.tag }}
+            timwitzdam/gitsave:latest
