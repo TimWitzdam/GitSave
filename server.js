@@ -8,6 +8,10 @@ import fs from "fs";
 import { authenticateJWT } from "./src/middleware/authenticateJWT.js";
 import { userExistCheck } from "./src/middleware/userExistCheck.js";
 import { sanitize } from "./src/lib/sanatize.js";
+import Logger from "./src/lib/logger.js";
+
+const logger = new Logger("server.js");
+logger.info("Server starting");
 
 const app = express();
 const PORT = 3000;
@@ -117,7 +121,7 @@ app.get("/api/schedules", authenticateJWT, (req, res) => {
       return res.json(backupJobs);
     })
     .catch((error) => {
-      console.log(error);
+      logger.error(error);
       return res.status(500).send("Internal server error");
     });
 });
@@ -191,7 +195,7 @@ app.post("/api/schedules", authenticateJWT, (req, res) => {
       options,
       (error, stdout, stderr) => {
         if (error) {
-          console.log(error);
+          logger.error(error);
           return res
             .status(400)
             .send(
@@ -217,7 +221,7 @@ app.post("/api/schedules", authenticateJWT, (req, res) => {
             return res.json(newSchedule);
           })
           .catch((error) => {
-            console.log(error);
+            logger.error(error);
             return res.status(500).send("Internal server error");
           });
       }
@@ -342,7 +346,7 @@ app.post("/api/schedules/:id/backup", authenticateJWT, (req, res) => {
       );
     })
     .catch((error) => {
-      console.log(error);
+      logger.error(error);
       return res.status(500).send("Internal server error");
     });
 });
@@ -403,7 +407,7 @@ app.delete("/api/schedules/:id", authenticateJWT, (req, res) => {
       return res.send("Schedule deleted");
     })
     .catch((error) => {
-      console.log(error);
+      logger.error(error);
       return res.status(500).send("Internal server error");
     });
 });
@@ -461,7 +465,7 @@ app.get("/api/history", authenticateJWT, (req, res) => {
       return res.json({ backupHistory, totalCount });
     })
     .catch((error) => {
-      console.log(error);
+      logger.error(error);
       return res.status(500).send("Internal server error");
     });
 });
@@ -485,7 +489,7 @@ app.post("/api/access-tokens", authenticateJWT, (req, res) => {
       return res.json(accessToken);
     })
     .catch((error) => {
-      console.log(error);
+      logger.error(error);
       return res.status(500).send("Internal server error");
     });
 });
@@ -505,7 +509,7 @@ app.get("/api/access-tokens", authenticateJWT, (req, res) => {
       return res.json(accessTokens);
     })
     .catch((error) => {
-      console.log(error);
+      logger.error(error);
       return res.status(500).send("Internal server error");
     });
 });
@@ -601,7 +605,7 @@ function scheduleCronJobs() {
   prisma.backupJob
     .findMany()
     .then((backupJobs) => {
-      console.log(
+      logger.info(
         `Scheduling ${backupJobs.length} backup job${backupJobs.length === 0 || backupJobs.length > 1 ? "s" : ""}`
       );
       for (const job of backupJobs) {
@@ -617,7 +621,7 @@ function scheduleCronJobs() {
             })
             .then((accessToken) => {
               if (!accessToken) {
-                console.log("Access token not found");
+                logger.error("Access token not found");
               } else {
                 const repoWithToken = job.repository.replace(
                   "https://",
@@ -633,7 +637,7 @@ function scheduleCronJobs() {
               }
             })
             .catch((error) => {
-              console.log(error);
+              logger.error(error);
             });
         } else {
           pushCronJob(job.cron, job.id, job.name, job.repository, job.paused);
@@ -641,14 +645,14 @@ function scheduleCronJobs() {
       }
     })
     .catch((error) => {
-      console.log(error);
+      logger.error(error);
     });
 
   function pushCronJob(cronString, id, name, repository, paused) {
     const c = cron.schedule(cronString, () => {
-      console.log(`Creating backup of ${name}`);
+      logger.info(`Starting backup for ${name}`);
       createBackup(id, name, repository);
-      console.log("Finished backup");
+      logger.info(`Backup for ${name} completed`);
     });
     cronJobs.push({ id: id, job: c });
     if (paused) {
@@ -687,5 +691,5 @@ app.use(express.static("dist"));
 
 scheduleCronJobs();
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+  logger.info(`Server running on port ${PORT}`);
 });
