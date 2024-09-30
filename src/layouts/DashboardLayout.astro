@@ -6,10 +6,10 @@ import BurgerMenuIcon from "../components/icons/BurgerMenuIcon";
 import PhoneNavMenu from "../components/PhoneNavMenu";
 
 const links = [
-  { name: "Overview", href: "/dashboard/" },
+  { name: "Overview", href: "/dashboard/overview" },
   { name: "Schedules", href: "/dashboard/schedules/" },
   { name: "History", href: "/dashboard/history/" },
-  { name: "About", href: "/dashboard/about/" },
+  { name: "Settings", href: "/dashboard/settings/" },
 ];
 ---
 
@@ -41,7 +41,7 @@ const links = [
   const currentPath = window.location.pathname;
 
   links.forEach((link) => {
-    if (link.getAttribute("href") === currentPath) {
+    if (currentPath.startsWith(link.getAttribute("href"))) {
       link.classList.add("border-border-100", "text-white", "bg-border-200");
     }
   });
