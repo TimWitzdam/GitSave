@@ -1,0 +1,90 @@
+---
+import ShortArrow from "../components/icons/ShortArrow";
+import DashboardLayout from "./DashboardLayout.astro";
+
+type Props = {
+  currentPage: string;
+};
+
+const { currentPage }: Props = Astro.props;
+
+const settings = [
+  {
+    name: "User",
+    slug: "user",
+  },
+  {
+    name: "Storage",
+    slug: "storage",
+  },
+  {
+    name: "About",
+    slug: "about",
+  },
+];
+
+function getCurrentPage() {
+  return settings.find((setting) => setting.slug === currentPage);
+}
+---
+
+<script>
+  const links = document.querySelectorAll(".settings-link");
+  const currentPath = window.location.pathname.endsWith("/")
+    ? window.location.pathname.slice(0, -1)
+    : window.location.pathname;
+
+  links.forEach((link) => {
+    if (link.getAttribute("href") === currentPath) {
+      link.classList.add(
+        "border",
+        "text-white",
+        "bg-bg-200",
+        "hover:!bg-bg-200",
+        "border-border-200",
+        "hover:border-border-100",
+        "font-medium"
+      );
+    }
+  });
+</script>
+
+<DashboardLayout>
+  <div slot="header" class="flex items-center justify-between">
+    <h1 class="text-2xl font-medium">{getCurrentPage().name}</h1>
+  </div>
+  <div class="max-w-7xl mx-auto">
+    <div class="md:hidden">
+      {
+        settings.map((setting) => (
+          <a
+            class="p-4 flex justify-between items-center border-b border-border-200"
+            href={`/dashboard/settings/${setting.slug}`}
+          >
+            <span class="text-lg">{setting.name}</span>
+            <ShortArrow />
+          </a>
+        ))
+      }
+    </div>
+    <div class="hidden md:grid grid-cols-4 gap-4">
+      <div class="col-span-1 row-span-3">
+        <div class="py-4 pl-4 grid gap-2">
+          {
+            settings.map((setting) => (
+              <a
+                class="settings-link px-4 py-3 rounded-xl hover:bg-bg-300 transition-colors"
+                href={`/dashboard/settings/${setting.slug}`}
+              >
+                {setting.name}
+              </a>
+            ))
+          }
+        </div>
+      </div>
+      <div class="col-span-3 row-span-3 py-4 pr-4">
+        <slot />
+      </div>
+    </div>
+  </div>
+</DashboardLayout>

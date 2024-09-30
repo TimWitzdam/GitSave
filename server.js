@@ -514,6 +514,59 @@ app.get("/api/access-tokens", authenticateJWT, (req, res) => {
     });
 });
 
+app.get("/api/user/name", authenticateJWT, (req, res) => {
+  return res.json({ username: req.user.username });
+});
+
+app.post("/api/user/password", authenticateJWT, (req, res) => {
+  const { password, newPassword } = req.body;
+
+  if (!password || !newPassword) {
+    return res.status(400).send("Password and new password are required");
+  }
+
+  prisma.user
+    .findUnique({
+      where: {
+        username: req.user.username,
+      },
+    })
+    .then((user) => {
+      bcrypt.compare(password, user.password, (err, result) => {
+        if (err || !result) {
+          return res.status(401).send("Invalid password");
+        }
+
+        bcrypt.hash(newPassword, 10, (err, hash) => {
+          if (err) {
+            return res.status(500).send("Internal server error");
+          }
+
+          prisma.user
+            .update({
+              where: {
+                username: req.user.username,
+              },
+              data: {
+                password: hash,
+              },
+            })
+            .then(() => {
+              return res.send({ message: "Password updated" });
+            })
+            .catch((error) => {
+              logger.error(error);
+              return res.status(500).send("Internal server error");
+            });
+        });
+      });
+    })
+    .catch((error) => {
+      logger.error(error);
+      return res.status(500).send("Internal server error");
+    });
+});
+
 function createHistoryEntry(data) {
   prisma.backupHistory
     .create({

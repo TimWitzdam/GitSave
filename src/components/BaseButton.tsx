@@ -25,7 +25,7 @@ export default function BaseButton({
       id={id}
       onClick={onClick}
       type={buttonType}
-      className={`px-4 py-3 rounded-lg border-2 transition-colors ${buttonStyles[type]} ${fullWidth ? "w-full" : ""}`}
+      className={`px-5 py-3 rounded-lg border-2 transition-colors ${buttonStyles[type]} ${fullWidth ? "w-full" : ""}`}
     >
       {children}
     </button>

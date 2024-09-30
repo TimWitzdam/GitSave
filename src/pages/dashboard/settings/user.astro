@@ -1,0 +1,9 @@
+---
+import UserSettings from "../../../components/dashboard/settings/UserSettings";
+import SettingsLayout from "../../../layouts/SettingsLayout.astro";
+---
+
+<title>User settings | GitSave</title>
+<SettingsLayout currentPage="user">
+  <UserSettings client:load />
+</SettingsLayout>
