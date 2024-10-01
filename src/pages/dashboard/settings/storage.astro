@@ -1,0 +1,9 @@
+---
+import StorageSettings from "../../../components/dashboard/settings/StorageSettings";
+import SettingsLayout from "../../../layouts/SettingsLayout.astro";
+---
+
+<title>Storage settings | GitSave</title>
+<SettingsLayout currentPage="user">
+  <StorageSettings client:load />
+</SettingsLayout>

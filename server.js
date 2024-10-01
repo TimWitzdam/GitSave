@@ -9,6 +9,7 @@ import { authenticateJWT } from "./src/middleware/authenticateJWT.js";
 import { userExistCheck } from "./src/middleware/userExistCheck.js";
 import { sanitize } from "./src/lib/sanatize.js";
 import Logger from "./src/lib/logger.js";
+import SambaClient from "samba-client";
 
 const logger = new Logger("server.js");
 logger.info("Server starting");
@@ -18,6 +19,32 @@ const PORT = 3000;
 const JWT_SECRET = process.env.JWT_SECRET;
 let cronJobs = [];
 app.use(express.json());
+
+async function prepareDatabase() {
+  async function createAppConfig(key, value, dataType) {
+    try {
+      await prisma.appConfig.findFirstOrThrow({
+        where: { key },
+      });
+    } catch (error) {
+      await prisma.appConfig.create({
+        data: {
+          key,
+          value,
+          dataType,
+        },
+      });
+    }
+  }
+
+  await createAppConfig("default_location", "local_folder", "string");
+  await createAppConfig("smb_address", "", "string");
+  await createAppConfig("smb_location", "", "string");
+  await createAppConfig("smb_username", "", "string");
+  await createAppConfig("smb_password", "", "string");
+}
+
+await prepareDatabase();
 
 function createCronExpression(every, timespan) {
   const currentDate = new Date();
@@ -565,6 +592,105 @@ app.post("/api/user/password", authenticateJWT, (req, res) => {
       logger.error(error);
       return res.status(500).send("Internal server error");
     });
+});
+
+app.get("/api/config/storage", authenticateJWT, (req, res) => {
+  prisma.appConfig
+    .findMany({
+      where: {
+        OR: [
+          {
+            key: "default_location",
+          },
+          {
+            key: "smb_address",
+          },
+          {
+            key: "smb_location",
+          },
+          {
+            key: "smb_username",
+          },
+        ],
+      },
+    })
+    .then((config) => {
+      const storageConfig = {};
+      for (const item of config) {
+        switch (item.key) {
+          case "default_location":
+            storageConfig.defaultLocation = item.value;
+            break;
+          case "smb_address":
+            storageConfig.smbAddress = item.value;
+            break;
+          case "smb_location":
+            storageConfig.smbLocation = item.value;
+            break;
+          case "smb_username":
+            storageConfig.smbUsername = item.value;
+            break;
+        }
+      }
+
+      return res.json(storageConfig);
+    })
+    .catch((error) => {
+      logger.error(error);
+      return res.status(500).send("Internal server error");
+    });
+});
+
+app.put("/api/config/storage", authenticateJWT, async (req, res) => {
+  const { location, serverAddress, remoteLocation, username, password } =
+    req.body;
+
+  async function updateConfig(key, value) {
+    await prisma.appConfig.update({
+      where: { key },
+      data: { value },
+    });
+  }
+
+  try {
+    if (location === "smb_share") {
+      if (!serverAddress || !remoteLocation || !username || !password) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const client = new SambaClient({
+        address: `//${serverAddress}`,
+        username,
+        password,
+      });
+
+      // Test connection
+      await client.listFiles();
+
+      // Update configurations
+      await Promise.all([
+        updateConfig("default_location", "smb_share"),
+        updateConfig("smb_address", serverAddress),
+        updateConfig("smb_location", remoteLocation),
+        updateConfig("smb_username", username),
+        updateConfig("smb_password", password),
+      ]);
+    } else if (location === "local_folder") {
+      await updateConfig("default_location", "local_folder");
+    } else {
+      return res.status(400).json({ error: "Invalid location" });
+    }
+
+    res.json({ message: "Setting saved" });
+  } catch (error) {
+    logger.error(`Error in storage configuration: ${error.message}`);
+    res.status(500).json({
+      error:
+        "Error connecting to storage. Please check the wiki on GitHub for more information.",
+      details:
+        "https://github.com/TimWitzdam/GitSave/wiki/How-to-set-up-SMB-share",
+    });
+  }
 });
 
 function createHistoryEntry(data) {

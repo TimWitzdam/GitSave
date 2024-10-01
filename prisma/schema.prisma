@@ -47,3 +47,11 @@ model accessToken {
   username String
   backupJobs backupJob[]
 }
+
+model appConfig {
+  id          Int      @id @default(autoincrement())
+  key   String @unique
+  value String
+  dataType    String
+  updatedAt   DateTime @updatedAt
+}
