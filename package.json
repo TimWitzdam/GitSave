@@ -1,7 +1,7 @@
 {
   "name": "gitsave",
   "type": "module",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "scripts": {
     "dev": "astro dev",
     "start": "npm run build && nodemon server.js",
