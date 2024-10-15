@@ -2,7 +2,11 @@
 import SettingsLayout from "../../../layouts/SettingsLayout.astro";
 ---
 
+<script>
+  if (window.innerWidth > 768) {
+    window.location.href = "/dashboard/settings/user";
+  }
+</script>
+
 <title>Settings | GitSave</title>
-<SettingsLayout currentPage="user">
-  <div class="border border-border-200 p-4 rounded-xl bg-bg-200">test</div>
-</SettingsLayout>
+<SettingsLayout currentPage="overview" />

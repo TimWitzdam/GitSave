@@ -10,6 +10,11 @@ const { currentPage }: Props = Astro.props;
 
 const settings = [
   {
+    name: "Overview",
+    slug: "overview",
+    hidden: true,
+  },
+  {
     name: "User",
     slug: "user",
   },
@@ -51,38 +56,44 @@ function getCurrentPage() {
 
 <DashboardLayout>
   <div slot="header" class="flex items-center justify-between">
-    <h1 class="text-2xl font-medium">{getCurrentPage().name}</h1>
+    <h1 class="text-2xl font-medium">{getCurrentPage()?.name}</h1>
   </div>
   <div class="max-w-7xl mx-auto">
-    <div class="md:hidden">
-      {
-        settings.map((setting) => (
-          <a
-            class="p-4 flex justify-between items-center border-b border-border-200"
-            href={`/dashboard/settings/${setting.slug}`}
-          >
-            <span class="text-lg">{setting.name}</span>
-            <ShortArrow />
-          </a>
-        ))
-      }
-    </div>
-    <div class="hidden md:grid grid-cols-4 gap-4">
-      <div class="col-span-1 row-span-3">
-        <div class="py-4 pl-4 grid gap-2">
-          {
-            settings.map((setting) => (
+    {
+      currentPage === "overview" && (
+        <div class="md:hidden">
+          {settings
+            .filter((setting) => !setting.hidden)
+            .map((setting) => (
               <a
-                class="settings-link px-4 py-3 rounded-xl hover:bg-bg-300 transition-colors"
+                class="p-4 flex justify-between items-center border-b border-border-200"
                 href={`/dashboard/settings/${setting.slug}`}
               >
-                {setting.name}
+                <span class="text-lg">{setting.name}</span>
+                <ShortArrow />
               </a>
-            ))
+            ))}
+        </div>
+      )
+    }
+    <div class="grid grid-cols-4 gap-4">
+      <div class="hidden md:block col-span-1 row-span-3">
+        <div class="py-4 pl-4 grid gap-2">
+          {
+            settings
+              .filter((setting) => !setting.hidden)
+              .map((setting) => (
+                <a
+                  class="settings-link px-4 py-3 rounded-xl hover:bg-bg-300 transition-colors"
+                  href={`/dashboard/settings/${setting.slug}`}
+                >
+                  {setting.name}
+                </a>
+              ))
           }
         </div>
       </div>
-      <div class="col-span-3 row-span-3 py-4 pr-4">
+      <div class="col-span-4 px-4 md:col-span-3 md:row-span-3 py-4 md:pr-4">
         <slot />
       </div>
     </div>
