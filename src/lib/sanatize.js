@@ -14,7 +14,8 @@ export function sanitize(input, replacement = "") {
     .replace(controlRe, replacement)
     .replace(reservedRe, replacement)
     .replace(windowsReservedRe, replacement)
-    .replace(windowsTrailingRe, replacement);
+    .replace(windowsTrailingRe, replacement)
+    .replace(" ", "-");
 
   return sanitized;
 }

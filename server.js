@@ -716,63 +716,136 @@ function createBackup(id, name, repository) {
       GIT_ASKPASS: "/bin/false",
     },
   };
-  const folderName = `./backups/${id} (${sanitize(name)})`;
-  const child = execFile(
-    "git",
-    ["clone", "--mirror", repository, `${folderName}/${currentTimestamp}`],
-    options,
-    (error, stdout, stderr) => {
-      if (error) {
-        if (error.killed) {
+  prisma.appConfig
+    .findUnique({
+      where: {
+        key: "default_location",
+      },
+    })
+    .then((config) => {
+      let folderName = `./backups/${id}_${sanitize(name)}`;
+      if (config.value === "smb_share") {
+        folderName = `./tmp/backups/${id}-${sanitize(name)}`;
+      }
+      const child = execFile(
+        "git",
+        ["clone", "--mirror", repository, `${folderName}/${currentTimestamp}`],
+        options,
+        (error, stdout, stderr) => {
+          if (error) {
+            if (error.killed) {
+              backupJobData = {
+                backupJobId: id,
+                success: false,
+                message:
+                  "Request took too long (has the access token expired?)",
+              };
+            } else {
+              backupJobData = {
+                backupJobId: id,
+                success: false,
+                message: "Missing privileges or cannot access",
+              };
+            }
+          } else {
+            backupJobData = {
+              backupJobId: id,
+              success: true,
+            };
+            if (config.value === "smb_share") {
+              prisma.appConfig
+                .findMany({
+                  where: {
+                    OR: [
+                      {
+                        key: "smb_address",
+                      },
+                      {
+                        key: "smb_location",
+                      },
+                      {
+                        key: "smb_username",
+                      },
+                      {
+                        key: "smb_password",
+                      },
+                    ],
+                  },
+                })
+                .then((config) => {
+                  const smbAddress = config.find(
+                    (c) => c.key === "smb_address"
+                  ).value;
+                  const smbLocation = config.find(
+                    (c) => c.key === "smb_location"
+                  ).value;
+                  const smbUsername = config.find(
+                    (c) => c.key === "smb_username"
+                  ).value;
+                  const smbPassword = config.find(
+                    (c) => c.key === "smb_password"
+                  ).value;
+                  execFile(
+                    "smbclient",
+                    [
+                      `//${smbAddress}`,
+                      "-U",
+                      smbUsername,
+                      "--password",
+                      smbPassword,
+                      "-c",
+                      `prompt OFF; recurse ON; mkdir ${smbLocation}/${id}-${sanitize(name)}/${currentTimestamp}; cd ${smbLocation}/${id}-${sanitize(name)}/${currentTimestamp}; lcd ${folderName}/${currentTimestamp}; mput *`,
+                    ],
+                    options,
+                    (error, stdout, stderr) => {
+                      if (error) {
+                        logger.error(
+                          "Something went wrong backing up to SMB. Make sure the server is reachable and the credentials are correct."
+                        );
+                      } else {
+                        createHistoryEntry(backupJobData);
+                        fs.rmSync(`${folderName}/${currentTimestamp}`, {
+                          recursive: true,
+                          force: true,
+                        });
+                      }
+                    }
+                  );
+                });
+            } else {
+              fs.readdir(`${folderName}/`, (err, files) => {
+                if (files.length >= 2) {
+                  const oldFiles = files.filter((f) => f != currentTimestamp);
+                  for (const oldFile of oldFiles) {
+                    fs.rmSync(`${folderName}/${oldFile}`, {
+                      recursive: true,
+                      force: true,
+                    });
+                  }
+                }
+              });
+              createHistoryEntry(backupJobData);
+            }
+          }
+        }
+      );
+
+      const timeout = setTimeout(() => {
+        child.kill();
+      }, 15000);
+
+      child.on("exit", (code) => {
+        clearTimeout(timeout);
+        if (code === null) {
           backupJobData = {
             backupJobId: id,
             success: false,
             message: "Request took too long (has the access token expired?)",
           };
-        } else {
-          backupJobData = {
-            backupJobId: id,
-            success: false,
-            message: "Missing privileges or cannot access",
-          };
+          createHistoryEntry(backupJobData);
         }
-      } else {
-        backupJobData = {
-          backupJobId: id,
-          success: true,
-        };
-        fs.readdir(`${folderName}/`, (err, files) => {
-          if (files.length >= 2) {
-            const oldFiles = files.filter((f) => f != currentTimestamp);
-            for (const oldFile of oldFiles) {
-              fs.rmSync(`${folderName}/${oldFile}`, {
-                recursive: true,
-                force: true,
-              });
-            }
-          }
-        });
-      }
-
-      createHistoryEntry(backupJobData);
-    }
-  );
-
-  const timeout = setTimeout(() => {
-    child.kill();
-  }, 15000);
-
-  child.on("exit", (code) => {
-    clearTimeout(timeout);
-    if (code === null) {
-      backupJobData = {
-        backupJobId: id,
-        success: false,
-        message: "Request took too long (has the access token expired?)",
-      };
-      createHistoryEntry(backupJobData);
-    }
-  });
+      });
+    });
 }
 
 function scheduleCronJobs() {

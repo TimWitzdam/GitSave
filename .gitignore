@@ -28,3 +28,4 @@ dev.db
 test.http
 backups
 data
+tmp
