@@ -91,19 +91,21 @@ export default function StorageSettings() {
                 placeholder="Server address with share (e.g. 192.168.1.1/backups)"
                 value={serverAddress}
                 onChange={(e) => setServerAddress(e.target.value)}
+                required
               />
               <BaseInput
                 type="text"
                 placeholder="Remote location"
                 value={remoteLocation}
                 onChange={(e) => setRemoteLocation(e.target.value)}
+                required
               />
-
               <BaseInput
                 type="text"
                 placeholder="Username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                required
               />
               <div className="group relative">
                 <BaseInput
@@ -111,6 +113,7 @@ export default function StorageSettings() {
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  required
                 />
                 <div className="hidden group-hover:block group-focus-within:block absolute -mt-10 top-0 left-0 bg-bg-100 rounded-xl p-3 z-10">
                   <p className="text-xs text-secondary">
