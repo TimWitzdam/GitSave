@@ -42,7 +42,7 @@ export default function UserSettings() {
     setUsernameSuccess("");
 
     fetch("/api/user/name", {
-      method: "POST",
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
@@ -60,6 +60,7 @@ export default function UserSettings() {
 
         localStorage.setItem("username", data.username);
         setUsername(data.username);
+        document.cookie = `auth_session=${data.token}; max-age=604800; path=/; SameSite=Strict`;
         setUsernameSuccess("Username updated successfully.");
       })
       .catch((err) => {

@@ -545,6 +545,50 @@ app.get("/api/user/name", authenticateJWT, (req, res) => {
   return res.json({ username: req.user.username });
 });
 
+app.put("/api/user/name", authenticateJWT, (req, res) => {
+  const { username } = req.body;
+
+  if (!username) {
+    return res.status(400).send("Username is required");
+  }
+
+  prisma.user
+    .findUnique({
+      where: {
+        username: username,
+      },
+    })
+    .then((existingUser) => {
+      if (existingUser) {
+        return res.status(400).send("Username already taken");
+      }
+
+      prisma.user
+        .update({
+          where: {
+            username: req.user.username,
+          },
+          data: {
+            username: username,
+          },
+        })
+        .then(() => {
+          const token = jwt.sign({ username }, JWT_SECRET, {
+            expiresIn: "7d",
+          });
+          return res.json({ username, token });
+        })
+        .catch((error) => {
+          logger.error(error);
+          return res.status(500).send("Internal server error");
+        });
+    })
+    .catch((error) => {
+      logger.error(error);
+      return res.status(500).send("Internal server error");
+    });
+});
+
 app.post("/api/user/password", authenticateJWT, (req, res) => {
   const { password, newPassword } = req.body;
 
