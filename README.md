@@ -21,6 +21,7 @@ So be prepared and keep backups of your own and favourite Git repositories.
 - Support for GitHub, GitLab and other Git platforms
 - Pause/resume schedules
 - View backup history
+- Support for backing up to a SMB share
 
 ## 🚀 Deploy GitSave for yourself
 > [!WARNING]
