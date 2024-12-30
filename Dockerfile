@@ -2,6 +2,7 @@ FROM node:lts-alpine AS base
 WORKDIR /app
 
 COPY package.json package-lock.json ./
+RUN apk add --no-cache openssl
 
 FROM base AS prod-deps
 RUN npm install --production
