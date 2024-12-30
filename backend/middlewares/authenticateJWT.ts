@@ -1,18 +1,20 @@
 import jwt from "jsonwebtoken";
+import type { Request, Response, NextFunction } from "express";
+import { JWT_SECRET } from "../configs/app.config";
+import { User } from "../types/User";
+import { AuthenticatedRequest } from "../types/AuthenticatedRequest";
 
-const JWT_SECRET = process.env.JWT_SECRET;
-
-function getCookie(cookies, name) {
+function getCookie(cookies: string | undefined, name: string) {
   const value = `; ${cookies}`;
   const parts = value.split(`; ${name}=`);
   if (parts.length === 2) return parts.pop()?.split(";").shift();
 }
 
 export const authenticateJWT = (
-  req,
-  res,
-  next,
-  redirectOnSuccess = undefined
+  req: Request,
+  res: Response,
+  next: NextFunction,
+  redirectOnSuccess: boolean | undefined = undefined
 ) => {
   const token = getCookie(req.headers.cookie, "auth_session");
 
@@ -30,7 +32,7 @@ export const authenticateJWT = (
         return res.redirect("/dashboard");
       }
 
-      req.user = user;
+      (req as AuthenticatedRequest).user = user as User;
       next();
     });
   } else {

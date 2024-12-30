@@ -26,4 +26,4 @@ RUN npx prisma generate
 RUN apk add --no-cache git
 
 EXPOSE 3000
-CMD npx prisma db push && node server.js
+CMD npx prisma db push && npx tsx backend/server.ts 

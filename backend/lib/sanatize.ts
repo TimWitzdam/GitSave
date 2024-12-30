@@ -1,4 +1,4 @@
-export function sanitize(input, replacement = "") {
+export function sanitize(input: string, replacement = "") {
   var illegalRe = /[\/\?<>\\:\*\|"]/g;
   var controlRe = /[\x00-\x1f\x80-\x9f]/g;
   var reservedRe = /^\.+$/;
