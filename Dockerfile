@@ -1,4 +1,4 @@
-FROM node:lts-alpine AS base
+FROM node:22.13.1-alpine AS base
 WORKDIR /app
 
 COPY package.json package-lock.json ./
