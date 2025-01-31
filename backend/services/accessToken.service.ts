@@ -16,12 +16,14 @@ export class AccessTokenService {
   }
   static async createAccessToken(
     name: string,
+    tokenUsername: string,
     token: string,
     username: string
   ) {
     const accessToken = await prisma.accessToken.create({
       data: {
         name: name,
+        tokenUsername: tokenUsername,
         token: token,
         username: username,
       },

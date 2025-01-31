@@ -79,6 +79,7 @@ export default function AddSchedulePopup() {
     const form = e.currentTarget;
     const formData = new FormData(form);
     const name = formData.get("access-token-name") as string;
+    const tokenUsername = formData.get("access-token-username") as string;
     const token = formData.get("access-token") as string;
 
     fetch("/api/access-tokens", {
@@ -86,7 +87,7 @@ export default function AddSchedulePopup() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name, token }),
+      body: JSON.stringify({ name, tokenUsername, token }),
     }).then(() => {
       form.reset();
       setShowAddAccessToken(false);
@@ -255,6 +256,13 @@ export default function AddSchedulePopup() {
               label="Name"
               placeholder="Enter access token name"
               name="access-token-name"
+              required
+            />
+            <BaseInput
+              type="text"
+              label="Username"
+              placeholder="Enter access token username"
+              name="access-token-username"
               required
             />
             <BaseInput
