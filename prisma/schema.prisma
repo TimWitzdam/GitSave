@@ -41,6 +41,7 @@ model backupHistory {
 
 model accessToken {
   id Int @id @default(autoincrement())
+  tokenUsername String
   token String
   name String
   user user @relation(fields: [username], references: [username])

@@ -40,7 +40,7 @@ export async function createSchedule(req: Request, res: Response) {
 
     repoUrl.href = repoUrl.href.replace(
       "https://",
-      `https://${accessToken.token}@`,
+      `https://${accessToken.tokenUsername}:${accessToken.token}@`,
     );
   }
 

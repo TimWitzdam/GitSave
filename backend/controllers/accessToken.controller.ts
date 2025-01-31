@@ -10,11 +10,12 @@ export async function getAccessTokens(req: Request, res: Response) {
 }
 
 export async function createAccessToken(req: Request, res: Response) {
-  const { name, token } = req.body;
+  const { name, token, tokenUsername } = req.body;
   const username = (req as AuthenticatedRequest).user.username;
 
   const accessToken = await AccessTokenService.createAccessToken(
     name,
+    tokenUsername,
     token,
     username
   );
