@@ -245,7 +245,7 @@ export default function AddSchedulePopup() {
           <div className="bg-bg-200 p-4 border-t border-border-200 flex flex-col gap-6">
             <a
               className="text-secondary underline hover:text-white transition-colors"
-              href="https://github.com/TimWitzdam/GitSave/wiki/How-to-create-a-GitHub-access-token"
+              href="https://witzdam.com/docs/gitsave/how-to-create-a-github-access-token"
               target="_blank"
             >
               How to create a GitHub access token

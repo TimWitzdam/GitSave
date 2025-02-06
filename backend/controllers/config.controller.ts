@@ -49,8 +49,7 @@ export async function updateStorageConfig(req: Request, res: Response) {
     res.status(500).json({
       error:
         "Error connecting to storage. Please check the wiki on GitHub for more information.",
-      details:
-        "https://github.com/TimWitzdam/GitSave/wiki/How-to-set-up-SMB-share",
+      details: "https://witzdam.com/docs/gitsave/how-to-set-up-smb-share",
     });
   }
 }

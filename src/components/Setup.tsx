@@ -173,7 +173,7 @@ export default function Setup() {
           </h1>
           <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-4">
             <a
-              href="https://github.com/TimWitzdam/GitSave/wiki/How-to-disable-authentication"
+              href="https://witzdam.com/docs/gitsave/how-to-disable-authentication"
               target="_blank"
               className="text-sm text-right opacity-60 cursor-pointer hover:opacity-100 transition-opacity"
             >
@@ -340,7 +340,7 @@ export default function Setup() {
               <div className="flex flex-col gap-6">
                 <a
                   className="text-secondary underline hover:text-white transition-colors"
-                  href="https://github.com/TimWitzdam/GitSave/wiki/How-to-create-a-GitHub-access-token"
+                  href="https://witzdam.com/docs/gitsave/how-to-create-a-github-access-token"
                   target="_blank"
                 >
                   How to create a GitHub access token
