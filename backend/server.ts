@@ -124,10 +124,8 @@ export function createBackup(id: number, name: string, repository: string) {
                   "--password",
                   config.smbPassword,
                   "-c",
-                  `prompt OFF; recurse ON; mkdir ${
-                    config.smbLocation
-                  }/${id}-${sanitize(name)}/${currentTimestamp}; cd ${
-                    config.smbLocation
+                  `prompt OFF; recurse ON; mkdir ${config.smbLocation
+                  }/${id}-${sanitize(name)}/${currentTimestamp}; cd ${config.smbLocation
                   }/${id}-${sanitize(
                     name,
                   )}/${currentTimestamp}; lcd ${folderName}/${currentTimestamp}; mput *`,
@@ -195,8 +193,7 @@ export function scheduleCronJobs() {
     .findMany()
     .then((backupJobs) => {
       logger.info(
-        `Scheduling ${backupJobs.length} backup job${
-          backupJobs.length === 0 || backupJobs.length > 1 ? "s" : ""
+        `Scheduling ${backupJobs.length} backup job${backupJobs.length === 0 || backupJobs.length > 1 ? "s" : ""
         }`,
       );
       for (const job of backupJobs) {

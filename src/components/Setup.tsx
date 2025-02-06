@@ -172,6 +172,13 @@ export default function Setup() {
             1. Account creation
           </h1>
           <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-4">
+            <a
+              href="https://github.com/TimWitzdam/GitSave/wiki/How-to-disable-authentication"
+              target="_blank"
+              className="text-sm text-right opacity-60 cursor-pointer hover:opacity-100 transition-opacity"
+            >
+              Use your own authentication provider →
+            </a>
             <BaseInput
               type="text"
               name="username"

@@ -9,35 +9,44 @@
 
 https://github.com/user-attachments/assets/301b28ca-6b72-490a-8efb-217e39fb73d3
 
-
-
 # Git happens...
+
 So be prepared and keep backups of your own and favourite Git repositories.
 
 ## 🛠️ Features
+
 - Easy to use and responsive web interface
 - Automated install using Docker
 - Scheduling of backups
 - Support for GitHub, GitLab and other Git platforms
+- Support for own authentication provider
 - Pause/resume schedules
 - View backup history
 - Support for backing up to a SMB share
 
 ## 🚀 Deploy GitSave for yourself
+
 > [!WARNING]
 > Make sure to change the env variable "JWT_SECRET" to something secure. [This website](https://jwtsecret.com/) may help you with that
 
 ### Single run command
+
 ```bash
-docker run -d --restart=always -p 3000:3000 -v gitsave:/app/data -v ./backups:/app/backups -e JWT_SECRET={YOUR_SECRET_HERE} --name GitSave timwitzdam/gitsave:latest
+docker run -d --restart=always -p 3000:3000 -v gitsave:/app/data -v ./backups:/app/backups -e JWT_SECRET={YOUR_SECRET_HERE} -e DISABLE_AUTH=false --name GitSave timwitzdam/gitsave:latest
 ```
+
 ### Docker compose
+
 1. Create .env file
+
 ```bash
 # You can generate a JWT_SECRET here: https://jwtsecret.com/
 JWT_SECRET="REPLACE_THIS"
+DISABLE_AUTH=false
 ```
+
 2. Create `docker-compose.yml` file
+
 ```yaml
 services:
   gitsave:
@@ -51,12 +60,14 @@ services:
       - ./backups:/app/backups
     environment:
       - JWT_SECRET=${JWT_SECRET:?error}
+      - DISABLE_AUTH=${DISABLE_AUTH:?error}
 
 volumes:
   gitsave:
 ```
 
 ## 👀 Any questions, suggestions or problems?
+
 You're welcome to contribute to GitSave or open an issue if you have any suggestions or find any problems.
 
 I'm also available via mail: [contact@witzdam.com](mailto:contact@witzdam.com)

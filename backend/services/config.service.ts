@@ -69,4 +69,12 @@ export class ConfigService {
       data: { value },
     });
   }
+
+  static async getConfigEntry(key: string) {
+    const config = await prisma.appConfig.findFirst({
+      where: { key },
+    });
+
+    return config;
+  }
 }

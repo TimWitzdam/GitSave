@@ -6,3 +6,4 @@ if (!process.env.JWT_SECRET) {
   exit(1);
 }
 export const JWT_SECRET = process.env.JWT_SECRET;
+export const DISABLE_AUTH = process.env.DISABLE_AUTH === "true";

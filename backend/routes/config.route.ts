@@ -1,6 +1,7 @@
 import express from "express";
 import { authenticateJWT } from "../middlewares/authenticateJWT";
 import {
+  getAuthDisabled,
   getStorageConfig,
   updateStorageConfig,
 } from "../controllers/config.controller";
@@ -14,7 +15,8 @@ configRouter.put(
   "/storage",
   authenticateJWT,
   validateSchema(updateStorageConfigRequest),
-  updateStorageConfig
+  updateStorageConfig,
 );
+configRouter.get("/authDisabled", getAuthDisabled);
 
 export default configRouter;

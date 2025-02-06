@@ -2,6 +2,7 @@ import Logger from "../lib/logger";
 import { ConfigService } from "../services/config.service";
 import SambaClient from "samba-client";
 import { Request, Response } from "express";
+import { DISABLE_AUTH } from "../configs/app.config";
 
 const logger = new Logger("config.controller");
 
@@ -52,4 +53,8 @@ export async function updateStorageConfig(req: Request, res: Response) {
         "https://github.com/TimWitzdam/GitSave/wiki/How-to-set-up-SMB-share",
     });
   }
+}
+
+export async function getAuthDisabled(req: Request, res: Response) {
+  return res.json({ DISABLE_AUTH });
 }

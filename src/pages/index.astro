@@ -3,24 +3,42 @@ import prisma from "../../prisma/client";
 
 const users = await prisma.user.findMany({});
 const userExists = users.length > 0;
+
 ---
 
 <script is:inline define:vars={{ userExists }}>
-  function getCookie(cookies, name) {
-    const value = `; ${cookies}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()?.split(";").shift();
+  async function checkIfAuthDisabled() {
+    try {
+      const authDisabled = await fetch("/api/config/authDisabled");
+      const authDisabledValue = await authDisabled.json();
+
+      if (authDisabledValue.DISABLE_AUTH) {
+        location.href = "/dashboard";
+        return true;
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }
 
-  const cookies = document.cookie;
+  checkIfAuthDisabled().then((re) => {
+    if (re) return;
+    function getCookie(cookies, name) {
+      const value = `; ${cookies}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop()?.split(";").shift();
+    }
 
-  if (!userExists) {
-    location.href = "/setup";
-  } else if (getCookie(cookies, "auth_session")) {
-    location.href = "/dashboard";
-  } else {
-    location.href = "/login";
-  }
+    const cookies = document.cookie;
+
+    if (!userExists) {
+      location.href = "/setup";
+    } else if (getCookie(cookies, "auth_session")) {
+      location.href = "/dashboard";
+    } else {
+      location.href = "/login";
+    }
+  }).catch(console.error);
 </script>
 
 <html lang="en">
