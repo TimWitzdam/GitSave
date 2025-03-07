@@ -1,4 +1,5 @@
 import prisma from "../../prisma/client";
+import { EncryptionService } from "./encryption.service";
 
 export class AccessTokenService {
   static async getAccessToken(username: string) {
@@ -17,12 +18,13 @@ export class AccessTokenService {
   static async createAccessToken(
     name: string,
     token: string,
-    username: string
+    username: string,
   ) {
+    const encryptedToken = EncryptionService.encrypt(token);
     const accessToken = await prisma.accessToken.create({
       data: {
         name: name,
-        token: token,
+        token: encryptedToken,
         username: username,
       },
     });

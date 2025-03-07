@@ -27,12 +27,13 @@ So be prepared and keep backups of your own and favourite Git repositories.
 ## 🚀 Deploy GitSave for yourself
 
 > [!WARNING]
-> Make sure to change the env variable "JWT_SECRET" to something secure. [This website](https://jwtsecret.com/) may help you with that
+> Make sure to change the env variables "JWT_SECRET" and "ENCRYPTION_SECRET" to something secure. [This website](https://jwtsecret.com/) may help you with that.
+> The ENCRYPTION_SECRET must be 32 characters long.
 
 ### Single run command
 
 ```bash
-docker run -d --restart=always -p 3000:3000 -v gitsave:/app/data -v ./backups:/app/backups -e JWT_SECRET={YOUR_SECRET_HERE} -e DISABLE_AUTH=false --name GitSave timwitzdam/gitsave:latest
+docker run -d --restart=always -p 3000:3000 -v gitsave:/app/data -v ./backups:/app/backups -e JWT_SECRET={YOUR_SECRET_HERE} -e ENCRYPTION_SECRET={YOUR_SECRET_HERE_32_CHARACTERS} -e DISABLE_AUTH=false --name GitSave timwitzdam/gitsave:latest
 ```
 
 ### Docker compose
@@ -43,6 +44,7 @@ docker run -d --restart=always -p 3000:3000 -v gitsave:/app/data -v ./backups:/a
 # You can generate a JWT_SECRET here: https://jwtsecret.com/
 JWT_SECRET="REPLACE_THIS"
 DISABLE_AUTH=false
+ENCRYPTION_SECRET="REPLACE_THIS_WITH_32_CHARACTERS_SECRET"
 ```
 
 2. Create `docker-compose.yml` file
@@ -61,6 +63,7 @@ services:
     environment:
       - JWT_SECRET=${JWT_SECRET:?error}
       - DISABLE_AUTH=${DISABLE_AUTH:?error}
+      - ENCRYPTION_SECRET=${ENCRYPTION_SECRET:?error}
 
 volumes:
   gitsave:

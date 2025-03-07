@@ -1,4 +1,5 @@
 import prisma from "../../prisma/client";
+import { EncryptionService } from "./encryption.service";
 
 export class ScheduleService {
   static async getSchedulesByUser(username: string) {
@@ -39,7 +40,7 @@ export class ScheduleService {
       private: string;
       accessTokenId: string;
     },
-    initialUrl: string
+    initialUrl: string,
   ) {
     const newSchedule = await prisma.backupJob.create({
       data: {
@@ -62,7 +63,7 @@ export class ScheduleService {
       every: number;
       timespan: string;
     },
-    id: string
+    id: string,
   ) {
     const updatedSchedule = await prisma.backupJob.update({
       where: {
@@ -120,7 +121,10 @@ export class ScheduleService {
       select: { token: true },
     });
 
-    return accessToken;
+    if (accessToken === null) return undefined;
+    const decryptedAccessToken = EncryptionService.decrypt(accessToken.token);
+
+    return decryptedAccessToken;
   }
 
   static createCronExpression(every: number, timespan: string) {

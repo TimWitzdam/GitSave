@@ -11,6 +11,7 @@ import { PORT } from "./configs/app.config";
 import apiRouter from "./routes/index.route";
 import { ConfigService } from "./services/config.service";
 import { CronJob } from "./types/CronJob";
+import { EncryptionService } from "./services/encryption.service";
 
 const logger = new Logger("server");
 logger.info("Server starting");
@@ -211,9 +212,12 @@ export function scheduleCronJobs() {
               if (!accessToken) {
                 logger.error("Access token not found");
               } else {
+                const decryptedToken = EncryptionService.decrypt(
+                  accessToken.token,
+                );
                 const repoWithToken = job.repository.replace(
                   "https://",
-                  `https://${accessToken.token}@`,
+                  `https://${decryptedToken}@`,
                 );
                 pushCronJob(
                   job.cron,

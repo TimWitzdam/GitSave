@@ -9,6 +9,7 @@ import {
 } from "../server";
 import { Request, Response } from "express";
 import { AuthenticatedRequest } from "../types/AuthenticatedRequest";
+import { EncryptionService } from "../services/encryption.service";
 
 const logger = new Logger("schedule.controller");
 
@@ -38,10 +39,7 @@ export async function createSchedule(req: Request, res: Response) {
       return res.status(400).send("Access token not found");
     }
 
-    repoUrl.href = repoUrl.href.replace(
-      "https://",
-      `https://${accessToken.token}@`,
-    );
+    repoUrl.href = repoUrl.href.replace("https://", `https://${accessToken}@`);
   }
 
   const options = {
@@ -143,6 +141,20 @@ export async function backupScheduleNow(req: Request, res: Response) {
 
   if (!schedule) {
     return res.status(404).send("Schedule not found");
+  }
+
+  if (schedule.accessTokenId) {
+    const accessToken = await ScheduleService.getAccessToken(
+      schedule.accessTokenId.toString(),
+    );
+    if (!accessToken) {
+      return res.status(400).send("Access token not found");
+    }
+
+    schedule.repository = schedule.repository.replace(
+      "https://",
+      `https://${accessToken}@`,
+    );
   }
 
   createBackup(schedule.id, schedule.name, schedule.repository);
