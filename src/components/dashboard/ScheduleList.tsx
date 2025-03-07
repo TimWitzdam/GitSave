@@ -151,6 +151,7 @@ export default function ScheduleList() {
               "Never"
             }
             last={schedules.length - 1 === index}
+            success={schedule.backupHistory[0]?.success}
             editClick={() =>
               setEditMenuDetails({
                 id: schedule.id,

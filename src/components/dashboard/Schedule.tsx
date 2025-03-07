@@ -8,6 +8,7 @@ type Props = {
   paused: boolean;
   lastBackup: string;
   last?: boolean;
+  success: boolean;
   editClick: () => void;
   backupNowClick: () => void;
   pauseClick: () => void;
@@ -36,7 +37,7 @@ export default function Schedule(props: Props) {
       <div className="flex justify-between items-start mb-3">
         <div className="flex gap-3 px-4 pt-4">
           <div
-            className={`${props.paused ? "bg-orange" : "bg-green"} rounded-full w-4 h-4 shrink-0`}
+            className={`${props.paused ? "bg-orange" : props.success ? "bg-green" : "bg-red"} rounded-full w-4 h-4 shrink-0`}
           ></div>
           <div>
             <p className="leading-none mb-1">{props.name}</p>
