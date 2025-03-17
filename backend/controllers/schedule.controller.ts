@@ -9,7 +9,6 @@ import {
 } from "../server";
 import { Request, Response } from "express";
 import { AuthenticatedRequest } from "../types/AuthenticatedRequest";
-import { EncryptionService } from "../services/encryption.service";
 
 const logger = new Logger("schedule.controller");
 
@@ -157,7 +156,12 @@ export async function backupScheduleNow(req: Request, res: Response) {
     );
   }
 
-  createBackup(schedule.id, schedule.name, schedule.repository);
+  createBackup(
+    schedule.id,
+    schedule.name,
+    schedule.repository,
+    schedule.keepLast,
+  );
   return res.send(
     "Backup started. Depending on the size of the repository, this may take a while.",
   );

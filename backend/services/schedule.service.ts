@@ -39,6 +39,7 @@ export class ScheduleService {
       timespan: string;
       private: string;
       accessTokenId: string;
+      keepLast: number;
     },
     initialUrl: string,
   ) {
@@ -50,6 +51,7 @@ export class ScheduleService {
         username: username,
         accessTokenId:
           schedule.private === "on" ? parseInt(schedule.accessTokenId) : null,
+        keepLast: schedule.keepLast,
       },
     });
 
@@ -62,6 +64,7 @@ export class ScheduleService {
       repository: string;
       every: number;
       timespan: string;
+      keepLast: number;
     },
     id: string,
   ) {
@@ -73,6 +76,7 @@ export class ScheduleService {
         name: schedule.name,
         repository: schedule.repository,
         cron: this.createCronExpression(schedule.every, schedule.timespan),
+        keepLast: schedule.keepLast,
       },
     });
 

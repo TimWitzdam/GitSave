@@ -4,6 +4,7 @@ import BaseButton from "../BaseButton";
 
 export default function AddSchedulePopup() {
   const [every, setEvery] = React.useState(1);
+  const [keepLast, setKeepLast] = React.useState(5);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState(false);
@@ -14,13 +15,17 @@ export default function AddSchedulePopup() {
     { id: number; name: string }[]
   >([]);
 
-  function updateEvery(e: React.ChangeEvent<HTMLInputElement>) {
+  function updateIfNotBelow(
+    e: React.ChangeEvent<HTMLInputElement>,
+    setFunction: React.Dispatch<React.SetStateAction<number>>,
+    defaultValue = 1,
+  ) {
     if (parseInt(e.target.value) < 1) {
-      setEvery(1);
+      setFunction(1);
       return;
     }
 
-    setEvery(parseInt(e.target.value));
+    setFunction(parseInt(e.target.value));
   }
 
   function updateAccessToken(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -43,6 +48,7 @@ export default function AddSchedulePopup() {
     const timespan = formData.get("timespan") as string;
     const privateRepo = formData.get("private") as string;
     const accessTokenId = formData.get("access-token") as string;
+    const keepLast = formData.get("keep-last") as string;
 
     setLoading(true);
     fetch("/api/schedules", {
@@ -57,6 +63,7 @@ export default function AddSchedulePopup() {
         timespan,
         private: privateRepo,
         accessTokenId,
+        keepLast: parseInt(keepLast),
       }),
     })
       .then((res) => {
@@ -177,7 +184,7 @@ export default function AddSchedulePopup() {
                     type="number"
                     value={every}
                     name="every"
-                    onChange={updateEvery}
+                    onChange={(e) => updateIfNotBelow(e, setEvery)}
                     width="sm:w-24"
                     required
                   />
@@ -196,6 +203,26 @@ export default function AddSchedulePopup() {
                     Day{every === 0 || every > 1 ? "s" : ""}
                   </option>
                 </select>
+              </div>
+            </div>
+            <div>
+              <label className="text-secondary">Settings</label>
+              <div className="flex flex-col gap-2 mt-2 sm:flex-row sm:items-center ">
+                <div className="shrink-0 rounded-lg bg-bg-300 border-2 border-border-200 text-center py-3 px-4 text-secondary cursor-not-allowed">
+                  Keep last
+                </div>
+                <div className="w-fit">
+                  <BaseInput
+                    type="number"
+                    value={keepLast}
+                    name="keep-last"
+                    onChange={(e) => updateIfNotBelow(e, setKeepLast, 5)}
+                    required
+                  />
+                </div>
+                <div className="rounded-lg bg-bg-300 border-2 border-border-200 text-center py-3 px-4 text-secondary cursor-not-allowed">
+                  backup{keepLast === 0 || keepLast > 1 ? "s" : ""}
+                </div>
               </div>
               {error && <p className="text-red text-center mt-4">{error}</p>}
             </div>

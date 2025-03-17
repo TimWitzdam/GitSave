@@ -66,7 +66,12 @@ function createHistoryEntry(data: backupHistoryEntry) {
     });
 }
 
-export function createBackup(id: number, name: string, repository: string) {
+export function createBackup(
+  id: number,
+  name: string,
+  repository: string,
+  keepLast: number,
+) {
   let backupJobData: backupHistoryEntry = {
     backupJobId: id,
     success: false,
@@ -148,11 +153,15 @@ export function createBackup(id: number, name: string, repository: string) {
               );
             } else {
               fs.readdir(`${folderName}/`, (err, files) => {
-                if (files.length >= 2) {
+                if (files.length >= keepLast) {
                   const oldFiles = files.filter(
                     (f) => parseInt(f) != currentTimestamp,
                   );
-                  for (const oldFile of oldFiles) {
+                  oldFiles.sort((a, b) => parseInt(a) - parseInt(b));
+                  for (const oldFile of oldFiles.slice(
+                    0,
+                    oldFiles.length - keepLast + 1,
+                  )) {
                     fs.rmSync(`${folderName}/${oldFile}`, {
                       recursive: true,
                       force: true,
@@ -224,6 +233,7 @@ export function scheduleCronJobs() {
                   job.id,
                   job.name,
                   repoWithToken,
+                  job.keepLast,
                   job.paused,
                 );
               }
@@ -232,7 +242,14 @@ export function scheduleCronJobs() {
               logger.error(error);
             });
         } else {
-          pushCronJob(job.cron, job.id, job.name, job.repository, job.paused);
+          pushCronJob(
+            job.cron,
+            job.id,
+            job.name,
+            job.repository,
+            job.keepLast,
+            job.paused,
+          );
         }
       }
     })
@@ -245,11 +262,12 @@ export function scheduleCronJobs() {
     id: number,
     name: string,
     repository: string,
+    keepLast: number,
     paused: boolean,
   ) {
     const c = cron.schedule(cronString, () => {
       logger.info(`Starting backup for ${name}`);
-      createBackup(id, name, repository);
+      createBackup(id, name, repository, keepLast);
       logger.info(`Backup for ${name} completed`);
     });
     cronJobs.push({ id: id, job: c });

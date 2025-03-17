@@ -13,6 +13,7 @@ export default function ScheduleList() {
     name: string;
     cron: string;
     repository: string;
+    keepLast: number;
   } | null>(null);
   const [showBackupNow, setShowBackupNow] = React.useState("");
   const [showDelete, setShowDelete] = React.useState<number | null>(null);
@@ -158,6 +159,7 @@ export default function ScheduleList() {
                 name: schedule.name,
                 cron: schedule.cron,
                 repository: schedule.repository,
+                keepLast: schedule.keepLast,
               })
             }
             backupNowClick={() => backupNow(schedule.id)}
@@ -173,6 +175,7 @@ export default function ScheduleList() {
           cron={editMenuDetails.cron}
           repository={editMenuDetails.repository}
           closeEdit={closeEditMenu}
+          keepLast={editMenuDetails.keepLast}
         />
       )}
       {showBackupNow && (

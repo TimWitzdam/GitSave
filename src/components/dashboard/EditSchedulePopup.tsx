@@ -1,12 +1,14 @@
 import React from "react";
 import BaseInput from "../BaseInput";
 import BaseButton from "../BaseButton";
+import updateIfNotBelow from "../../lib/updateIfNotBelow";
 
 type Props = {
   id: number;
   name: string;
   cron: string;
   repository: string;
+  keepLast: number;
   closeEdit: () => void;
 };
 
@@ -20,6 +22,7 @@ export default function EditSchedulePopup(props: Props) {
   const extractedCronParams = extractCronParameters(props.cron);
   const [every, setEvery] = React.useState(extractedCronParams.every);
   const [timespan, setTimespan] = React.useState(extractedCronParams.timespan);
+  const [keepLast, setKeepLast] = React.useState(props.keepLast);
 
   function extractCronParameters(cronExpression: string) {
     const parts = cronExpression.split(" ");
@@ -39,15 +42,6 @@ export default function EditSchedulePopup(props: Props) {
     }
   }
 
-  function updateEvery(e: React.ChangeEvent<HTMLInputElement>) {
-    if (parseInt(e.target.value) < 1) {
-      setEvery(1);
-      return;
-    }
-
-    setEvery(parseInt(e.target.value));
-  }
-
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
@@ -57,6 +51,7 @@ export default function EditSchedulePopup(props: Props) {
     const repository = formData.get("repository") as string;
     const every = parseInt(formData.get("every") as string);
     const timespan = formData.get("timespan") as string;
+    const keepLast = parseInt(formData.get("keep-last") as string);
 
     setLoading(true);
     fetch(`/api/schedules/${props.id}`, {
@@ -64,7 +59,7 @@ export default function EditSchedulePopup(props: Props) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name, repository, every, timespan }),
+      body: JSON.stringify({ name, repository, every, timespan, keepLast }),
     })
       .then((res) => {
         if (res.ok) {
@@ -122,7 +117,7 @@ export default function EditSchedulePopup(props: Props) {
                     type="number"
                     value={every}
                     name="every"
-                    onChange={updateEvery}
+                    onChange={(e) => updateIfNotBelow(e, setEvery)}
                     width="sm:w-24"
                     required
                   />
@@ -143,6 +138,26 @@ export default function EditSchedulePopup(props: Props) {
                     Day{every === 0 || every > 1 ? "s" : ""}
                   </option>
                 </select>
+              </div>
+            </div>
+            <div>
+              <label className="text-secondary">Settings</label>
+              <div className="flex flex-col gap-2 mt-2 sm:flex-row sm:items-center ">
+                <div className="shrink-0 rounded-lg bg-bg-300 border-2 border-border-200 text-center py-3 px-4 text-secondary cursor-not-allowed">
+                  Keep last
+                </div>
+                <div className="w-fit">
+                  <BaseInput
+                    type="number"
+                    value={keepLast}
+                    name="keep-last"
+                    onChange={(e) => updateIfNotBelow(e, setKeepLast)}
+                    required
+                  />
+                </div>
+                <div className="rounded-lg bg-bg-300 border-2 border-border-200 text-center py-3 px-4 text-secondary cursor-not-allowed">
+                  backup{keepLast === 0 || keepLast > 1 ? "s" : ""}
+                </div>
               </div>
               {error && <p className="text-red text-center mt-4">{error}</p>}
             </div>

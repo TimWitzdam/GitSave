@@ -5,6 +5,7 @@ export type Schedule = {
   cron: string;
   paused: boolean;
   username: string;
+  keepLast: number;
 };
 
 export type ScheduleHistory = {
