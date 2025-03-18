@@ -1,12 +1,14 @@
 import React from "react";
 import BaseButton from "./BaseButton";
 import BaseInput from "./BaseInput";
+import updateIfNotBelow from "../lib/updateIfNotBelow";
 
 export default function Setup() {
   const [error, setError] = React.useState("");
   const [success, setSuccess] = React.useState("");
   const [step, setStep] = React.useState(0);
   const [every, setEvery] = React.useState(1);
+  const [keepLast, setKeepLast] = React.useState(5);
   const [loading, setLoading] = React.useState(false);
   const [showAddAccessToken, setShowAddAccessToken] = React.useState(false);
   const [privateRepo, setPrivateRepo] = React.useState(false);
@@ -14,15 +16,6 @@ export default function Setup() {
   const [availableAccessTokens, setAvailableAccessTokens] = React.useState<
     { id: number; name: string }[]
   >([]);
-
-  function updateEvery(e: React.ChangeEvent<HTMLInputElement>) {
-    if (parseInt(e.target.value) < 1) {
-      setEvery(1);
-      return;
-    }
-
-    setEvery(parseInt(e.target.value));
-  }
 
   function handleRegisterSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -81,6 +74,7 @@ export default function Setup() {
     const timespan = formData.get("timespan") as string;
     const privateRepo = formData.get("private") as string;
     const accessTokenId = formData.get("access-token") as string;
+    const keepLast = parseInt(formData.get("keep-last") as string);
 
     setLoading(true);
     fetch("/api/schedules", {
@@ -95,6 +89,7 @@ export default function Setup() {
         timespan,
         private: privateRepo,
         accessTokenId,
+        keepLast,
       }),
     })
       .then((res) => {
@@ -293,7 +288,7 @@ export default function Setup() {
                         type="number"
                         value={every}
                         name="every"
-                        onChange={updateEvery}
+                        onChange={(e) => updateIfNotBelow(e, setEvery)}
                         width="sm:w-24"
                         required
                       />
@@ -312,6 +307,26 @@ export default function Setup() {
                         Day{every === 0 || every > 1 ? "s" : ""}
                       </option>
                     </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-secondary">Settings</label>
+                  <div className="flex flex-col gap-2 mt-2 sm:flex-row sm:items-center ">
+                    <div className="shrink-0 rounded-lg bg-bg-300 border-2 border-border-200 text-center py-3 px-4 text-secondary cursor-not-allowed">
+                      Keep last
+                    </div>
+                    <div className="w-fit">
+                      <BaseInput
+                        type="number"
+                        value={keepLast}
+                        name="keep-last"
+                        onChange={(e) => updateIfNotBelow(e, setKeepLast)}
+                        required
+                      />
+                    </div>
+                    <div className="rounded-lg bg-bg-300 border-2 border-border-200 text-center py-3 px-4 text-secondary cursor-not-allowed">
+                      backup{keepLast === 0 || keepLast > 1 ? "s" : ""}
+                    </div>
                   </div>
                 </div>
                 <BaseButton buttonType="submit">

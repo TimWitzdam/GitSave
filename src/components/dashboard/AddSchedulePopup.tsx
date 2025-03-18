@@ -204,7 +204,7 @@ export default function AddSchedulePopup() {
                     type="number"
                     value={keepLast}
                     name="keep-last"
-                    onChange={(e) => updateIfNotBelow(e, setKeepLast, 5)}
+                    onChange={(e) => updateIfNotBelow(e, setKeepLast)}
                     required
                   />
                 </div>
