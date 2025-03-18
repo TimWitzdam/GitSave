@@ -1,6 +1,7 @@
 import React from "react";
 import BaseInput from "../BaseInput";
 import BaseButton from "../BaseButton";
+import updateIfNotBelow from "../../lib/updateIfNotBelow";
 
 export default function AddSchedulePopup() {
   const [every, setEvery] = React.useState(1);
@@ -14,19 +15,6 @@ export default function AddSchedulePopup() {
   const [availableAccessTokens, setAvailableAccessTokens] = React.useState<
     { id: number; name: string }[]
   >([]);
-
-  function updateIfNotBelow(
-    e: React.ChangeEvent<HTMLInputElement>,
-    setFunction: React.Dispatch<React.SetStateAction<number>>,
-    defaultValue = 1,
-  ) {
-    if (parseInt(e.target.value) < 1) {
-      setFunction(1);
-      return;
-    }
-
-    setFunction(parseInt(e.target.value));
-  }
 
   function updateAccessToken(e: React.ChangeEvent<HTMLSelectElement>) {
     if (e.target.value === "new") {

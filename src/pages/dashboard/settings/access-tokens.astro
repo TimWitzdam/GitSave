@@ -1,0 +1,9 @@
+---
+import AccessTokensSettings from "../../../components/dashboard/settings/AccessTokensSettings";
+import SettingsLayout from "../../../layouts/SettingsLayout.astro";
+---
+
+<title>Access tokens settings | GitSave</title>
+<SettingsLayout currentPage="access-tokens">
+  <AccessTokensSettings client:load />
+</SettingsLayout>
