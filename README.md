@@ -27,7 +27,7 @@ So be prepared and keep backups of your own and favourite Git repositories.
 ## 🚀 Deploy GitSave for yourself
 
 > [!WARNING]
-> Make sure to change the env variables "JWT_SECRET" and "ENCRYPTION_SECRET" to something secure. [This website](https://jwtsecret.com/) may help you with that.
+> Make sure to change the env variables "JWT_SECRET" and "ENCRYPTION_SECRET" to something secure. [https://jwtsecret.com/](https://jwtsecrets.com/) may help you with that.
 > The ENCRYPTION_SECRET must be 32 characters long.
 
 ### Single run command
