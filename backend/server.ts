@@ -7,7 +7,7 @@ import { authenticateJWT } from "./middlewares/authenticateJWT";
 import { userExistCheck } from "./middlewares/userExistCheck";
 import { sanitize } from "./lib/sanatize";
 import Logger from "./lib/logger";
-import { PORT } from "./configs/app.config";
+import { PORT, GIT_TIMEOUT } from "./configs/app.config";
 import apiRouter from "./routes/index.route";
 import { ConfigService } from "./services/config.service";
 import { CronJob } from "./types/CronJob";
@@ -70,7 +70,7 @@ export function createBackup(
   id: number,
   name: string,
   repository: string,
-  keepLast: number,
+  keepLast: number
 ) {
   let backupJobData: backupHistoryEntry = {
     backupJobId: id,
@@ -130,17 +130,19 @@ export function createBackup(
                   "--password",
                   config.smbPassword,
                   "-c",
-                  `prompt OFF; recurse ON; mkdir ${config.smbLocation
-                  }/${id}-${sanitize(name)}/${currentTimestamp}; cd ${config.smbLocation
+                  `prompt OFF; recurse ON; mkdir ${
+                    config.smbLocation
+                  }/${id}-${sanitize(name)}/${currentTimestamp}; cd ${
+                    config.smbLocation
                   }/${id}-${sanitize(
-                    name,
+                    name
                   )}/${currentTimestamp}; lcd ${folderName}/${currentTimestamp}; mput *`,
                 ],
                 options,
                 (error, stdout, stderr) => {
                   if (error) {
                     logger.error(
-                      "Something went wrong backing up to SMB. Make sure the server is reachable and the credentials are correct.",
+                      "Something went wrong backing up to SMB. Make sure the server is reachable and the credentials are correct."
                     );
                   } else {
                     createHistoryEntry(backupJobData);
@@ -149,18 +151,18 @@ export function createBackup(
                       force: true,
                     });
                   }
-                },
+                }
               );
             } else {
               fs.readdir(`${folderName}/`, (err, files) => {
                 if (files.length >= keepLast) {
                   const oldFiles = files.filter(
-                    (f) => parseInt(f) != currentTimestamp,
+                    (f) => parseInt(f) != currentTimestamp
                   );
                   oldFiles.sort((a, b) => parseInt(a) - parseInt(b));
                   for (const oldFile of oldFiles.slice(
                     0,
-                    oldFiles.length - keepLast + 1,
+                    oldFiles.length - keepLast + 1
                   )) {
                     fs.rmSync(`${folderName}/${oldFile}`, {
                       recursive: true,
@@ -172,12 +174,12 @@ export function createBackup(
               createHistoryEntry(backupJobData);
             }
           }
-        },
+        }
       );
 
       const timeout = setTimeout(() => {
         child.kill();
-      }, 15000);
+      }, parseInt(GIT_TIMEOUT || "15000"));
 
       child.on("exit", (code) => {
         clearTimeout(timeout);
@@ -203,8 +205,9 @@ export function scheduleCronJobs() {
     .findMany()
     .then((backupJobs) => {
       logger.info(
-        `Scheduling ${backupJobs.length} backup job${backupJobs.length === 0 || backupJobs.length > 1 ? "s" : ""
-        }`,
+        `Scheduling ${backupJobs.length} backup job${
+          backupJobs.length === 0 || backupJobs.length > 1 ? "s" : ""
+        }`
       );
       for (const job of backupJobs) {
         if (job.accessTokenId) {
@@ -222,11 +225,11 @@ export function scheduleCronJobs() {
                 logger.error("Access token not found");
               } else {
                 const decryptedToken = EncryptionService.decrypt(
-                  accessToken.token,
+                  accessToken.token
                 );
                 const repoWithToken = job.repository.replace(
                   "https://",
-                  `https://${decryptedToken}@`,
+                  `https://${decryptedToken}@`
                 );
                 pushCronJob(
                   job.cron,
@@ -234,7 +237,7 @@ export function scheduleCronJobs() {
                   job.name,
                   repoWithToken,
                   job.keepLast,
-                  job.paused,
+                  job.paused
                 );
               }
             })
@@ -248,7 +251,7 @@ export function scheduleCronJobs() {
             job.name,
             job.repository,
             job.keepLast,
-            job.paused,
+            job.paused
           );
         }
       }
@@ -263,7 +266,7 @@ export function scheduleCronJobs() {
     name: string,
     repository: string,
     keepLast: number,
-    paused: boolean,
+    paused: boolean
   ) {
     const c = cron.schedule(cronString, () => {
       logger.info(`Starting backup for ${name}`);
@@ -297,12 +300,12 @@ async function main() {
   app.use(
     "/dashboard",
     (req, res, next) => authenticateJWT(req, res, next, false),
-    express.static("dist/dashboard"),
+    express.static("dist/dashboard")
   );
   app.use(
     "/login",
     (req, res, next) => authenticateJWT(req, res, next, true),
-    express.static("dist/login"),
+    express.static("dist/login")
   );
   app.use("/setup", userExistCheck, express.static("dist/setup"));
   app.use(express.static("dist"));
