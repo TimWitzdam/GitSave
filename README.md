@@ -18,6 +18,7 @@ So be prepared and keep backups of your own and favourite Git repositories.
 - Easy to use and responsive web interface
 - Automated install using Docker
 - Scheduling of backups
+- Select amount of backups you want to keep
 - Support for GitHub, GitLab and other Git platforms
 - Support for own authentication provider
 - Pause/resume schedules
@@ -27,7 +28,7 @@ So be prepared and keep backups of your own and favourite Git repositories.
 ## 🚀 Deploy GitSave for yourself
 
 > [!WARNING]
-> Make sure to change the env variables "JWT_SECRET" and "ENCRYPTION_SECRET" to something secure. [https://jwtsecret.com/](https://jwtsecrets.com/) may help you with that.
+> Make sure to change the env variables "JWT_SECRET" and "ENCRYPTION_SECRET" to something secure. [This generator](https://witzdam.com/tools/coding/generator/jwt-secret-generator) may help you with that.
 > The ENCRYPTION_SECRET must be 32 characters long.
 
 ### Single run command
@@ -41,7 +42,7 @@ docker run -d --restart=always -p 3000:3000 -v gitsave:/app/data -v ./backups:/a
 1. Create .env file
 
 ```bash
-# You can generate a JWT_SECRET here: https://jwtsecret.com/
+# You can generate a JWT_SECRET here: https://witzdam.com/tools/coding/generator/jwt-secret-generator
 JWT_SECRET="REPLACE_THIS"
 DISABLE_AUTH=false
 ENCRYPTION_SECRET="REPLACE_THIS_WITH_32_CHARACTERS_SECRET"
