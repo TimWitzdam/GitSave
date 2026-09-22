@@ -5,10 +5,10 @@ COPY package.json package-lock.json ./
 RUN apk add --no-cache openssl
 
 FROM base AS prod-deps
-RUN npm install --production
+RUN npm install --omit=dev
 
 FROM base AS build-deps
-RUN npm install --production=false
+RUN npm install --omit=dev
 
 FROM build-deps AS build
 COPY . .
