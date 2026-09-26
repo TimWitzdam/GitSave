@@ -23,6 +23,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          platforms: "linux/arm64,linux/amd64"
           push: true
           tags: |
             timwitzdam/gitsave:${{ steps.get-latest-tag.outputs.tag }}
