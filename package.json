@@ -6,6 +6,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "start": "npm run build && npx tsx --env-file .env --watch backend/server.ts",
+    "secrets": "node scripts/generate-secrets.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",

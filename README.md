@@ -28,7 +28,7 @@ So be prepared and keep backups of your own and favourite Git repositories.
 ## 🚀 Deploy GitSave for yourself
 
 > [!WARNING]
-> Make sure to change the env variables "JWT_SECRET" and "ENCRYPTION_SECRET" to something secure. [This generator](https://witzdam.com/tools/coding/generator/jwt-secret-generator) may help you with that.
+> Make sure to change the env variables "JWT_SECRET" and "ENCRYPTION_SECRET" to something secure. Clone this repository and run `npm run secrets` (works on Windows, macOS and Linux) to generate a ready-to-use pair of secrets.
 > The ENCRYPTION_SECRET must be 32 characters long.
 
 ### Single run command
@@ -42,7 +42,7 @@ docker run -d --restart=always -p 3000:3000 -v gitsave:/app/data -v ./backups:/a
 1. Create .env file
 
 ```bash
-# You can generate a JWT_SECRET here: https://witzdam.com/tools/coding/generator/jwt-secret-generator
+# Generate a JWT_SECRET and a 32 character ENCRYPTION_SECRET: npm run secrets
 JWT_SECRET="REPLACE_THIS"
 DISABLE_AUTH=false
 ENCRYPTION_SECRET="REPLACE_THIS_WITH_32_CHARACTERS_SECRET"
