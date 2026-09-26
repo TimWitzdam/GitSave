@@ -45,7 +45,11 @@ export default function Schedule(props: Props) {
           </div>
         </div>
         <div className="relative" ref={menuRef}>
-          <button className="p-4 pb-0" onClick={() => setShowMenu(!showMenu)}>
+          <button
+            className="p-4 pb-0"
+            aria-label="Schedule actions"
+            onClick={() => setShowMenu(!showMenu)}
+          >
             <MenuIcon />
           </button>
           <div

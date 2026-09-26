@@ -30,6 +30,7 @@ export default function AccessToken(props: Props) {
       <div className="relative" ref={menuRef}>
         <button
           className="bg-bg-100 rounded-lg p-3 flex items-center justify-center transition-colors border border-transparent hover:border-border-200"
+          aria-label="Access token actions"
           onClick={() => setShowMenu(!showMenu)}
         >
           <MenuIcon />

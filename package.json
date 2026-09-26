@@ -5,7 +5,12 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "start": "npm run build && npx tsx --env-file .env --watch backend/server.ts"
+    "start": "npm run build && npx tsx --env-file .env --watch backend/server.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:all": "npm test && npm run test:e2e"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",
@@ -28,11 +33,22 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
     "@types/bcryptjs": "^2.4.6",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^22.12.0",
-    "prisma": "^5.18.0"
+    "@types/supertest": "^7.2.1",
+    "@vitejs/plugin-react": "^6.1.1",
+    "@vitest/coverage-v8": "^5.0.1",
+    "jsdom": "^30.1.1",
+    "prisma": "^5.18.0",
+    "supertest": "^7.3.0",
+    "vitest": "^5.0.1"
   },
   "overrides": {
     "vite": "^8.3.0"

@@ -33,6 +33,21 @@ Thank you for contributing to GitSave! This document outlines the process for co
    npm run build && node server.js
    ```
 
+7. **Run the tests**
+   The test suite covers the backend API, services, middlewares and the React components. It uses an isolated temporary SQLite database, so your local `data/GitSave.db` is never touched and no environment setup is required.
+   ```
+   npm test              # unit + integration tests (Vitest)
+   npm run test:watch    # re-run on file changes
+   npm run test:coverage # run with a coverage report
+   ```
+   End-to-end tests drive the real app in a headless browser (Playwright). They build the app, start it on port 3100 with a throw-away database and cover the setup, login, schedule, access token and settings flows.
+   ```
+   npx playwright install chromium  # one time: download the browser
+   npm run test:e2e
+   npm run test:all                 # unit + end-to-end
+   ```
+   Please make sure `npm test` passes before opening a pull request.
+
 ## Making Contributions
 
 1. Create a new branch for your feature or bug fix:

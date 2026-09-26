@@ -1,6 +1,6 @@
 import { exit } from "process";
 
-export const PORT = 3000;
+export const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 if (!process.env.JWT_SECRET) {
   console.error("JWT_SECRET is not set");
   exit(1);

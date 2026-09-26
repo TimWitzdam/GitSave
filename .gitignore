@@ -29,3 +29,11 @@ test.http
 backups
 data
 tmp
+
+# test coverage
+coverage/
+
+# playwright
+test-results/
+playwright-report/
+blob-report/
